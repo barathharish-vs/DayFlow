@@ -1,8 +1,85 @@
-/* App Level Styles */
-.app-container {
-  width: 100%;
+.app-root {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
+.auth-mode {
+  background-color: var(--color-canvas, #f8f9fc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-screens-wrapper {
+  width: 100%;
+}
+
+.portal-mode {
+  background-color: #f8fafc;
+}
+
+.app-main-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.content-scroll-canvas {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  overflow-y: auto;
+  background-color: #f8fafc;
+}
+
+/* Global Floating Toast */
+.global-toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-icon {
+  color: #38bdf8;
+  font-size: 20px;
+}
+
+@keyframes slideToastIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 868px) {
+  .content-scroll-canvas {
+    margin-left: 0;
+    padding-bottom: 70px;
+  }
+  .global-toast-notification {
+    bottom: 80px;
+    right: 16px;
+    left: 16px;
+    justify-content: center;
+  }
+}

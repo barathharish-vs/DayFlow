@@ -18,9 +18,15 @@ interface LoginFormErrors {
 
 interface LoginProps {
   onSwitchToRegister?: () => void;
+  onSwitchToForgotPassword?: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
+export const Login: React.FC<LoginProps> = ({
+  onSwitchToRegister,
+  onSwitchToForgotPassword,
+  onLoginSuccess,
+}) => {
   // 1. State for form input values
   const [formValues, setFormValues] = useState<LoginFormValues>({
     email: '',
@@ -88,9 +94,13 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
 
     const isValid = validateForm();
     if (isValid) {
-      // In this phase, we do NOT connect to a real backend.
-      // We display a gentle success notification to confirm validation works.
-      setSuccessMessage('Validation passed! Ready for backend connection in future phases.');
+      setSuccessMessage('Validation passed! Taking you to your dashboard...');
+      setTimeout(() => {
+        setSuccessMessage(null);
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+      }, 600);
     }
   };
 
@@ -204,7 +214,9 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               className="forgot-password-link"
               onClick={(e) => {
                 e.preventDefault();
-                alert('Forgot Password will be linked in a later phase!');
+                if (onSwitchToForgotPassword) {
+                  onSwitchToForgotPassword();
+                }
               }}
             >
               Forgot password?

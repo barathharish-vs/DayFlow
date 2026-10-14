@@ -21,9 +21,10 @@ interface RegisterFormErrors {
 
 interface RegisterProps {
   onSwitchToLogin: () => void;
+  onRegisterSuccess?: (name: string, email: string) => void;
 }
 
-export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
+export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
   // 1. Form state
   const [formValues, setFormValues] = useState<RegisterFormValues>({
     fullName: '',
@@ -118,8 +119,15 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
     const isValid = validateForm();
     if (isValid) {
-      // Phase 1 demo: No real backend connection
-      setSuccessMessage('Account created successfully (simulation)! You can now switch to Sign In.');
+      setSuccessMessage('Account created successfully! Taking you into DayFlow...');
+      setTimeout(() => {
+        setSuccessMessage(null);
+        if (onRegisterSuccess) {
+          onRegisterSuccess(formValues.fullName, formValues.email);
+        } else {
+          onSwitchToLogin();
+        }
+      }, 700);
     }
   };
 
