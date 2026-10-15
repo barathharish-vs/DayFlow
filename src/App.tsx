@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { useApp } from './context/AppContext';
+import type { UserProfile } from './types';
 import Login from './components/Login';
 import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
@@ -10,6 +12,16 @@ import WaterTracker from './components/WaterTracker';
 import Settings from './components/Settings';
 import './App.css';
 
+interface BackendUserProfile {
+  name?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+  dailyWaterGoal?: number | null;
+  notificationsEnabled?: boolean | null;
+  waterReminderFrequency?: number | null;
+  theme?: string | null;
+}
+
 const AppContent: React.FC = () => {
   const {
     isAuthenticated,
@@ -19,12 +31,64 @@ const AppContent: React.FC = () => {
     toastMessage,
   } = useApp();
 
-  // If user is NOT authenticated, private screens are never shown
   const showAuthPortal = !isAuthenticated;
+
+  const handleLoginSuccess = async () => {
+    const token = localStorage.getItem('dayflow_token');
+
+    if (!token) {
+      setCurrentScreen('login');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        localStorage.removeItem('dayflow_token');
+        setCurrentScreen('login');
+        alert('Could not verify your login. Please sign in again.');
+        return;
+      }
+
+      const profile: BackendUserProfile = await response.json();
+
+      if (!profile.email) {
+        localStorage.removeItem('dayflow_token');
+        setCurrentScreen('login');
+        alert('The server returned an invalid user profile.');
+        return;
+      }
+
+      const user: Partial<UserProfile> = {
+        name: profile.name || profile.email.split('@')[0],
+        email: profile.email,
+        avatarUrl:
+          profile.avatarUrl ||
+          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&h=160&q=80',
+        dailyWaterGoal: profile.dailyWaterGoal ?? 2500,
+        notificationsEnabled: profile.notificationsEnabled ?? true,
+        waterReminderFrequency: profile.waterReminderFrequency ?? 60,
+        theme:
+          profile.theme === 'dark' || profile.theme === 'system'
+            ? profile.theme
+            : 'light',
+      };
+
+      loginDemoSession(user);
+    } catch {
+      localStorage.removeItem('dayflow_token');
+      setCurrentScreen('login');
+      alert('Cannot connect to the server. Please try again.');
+    }
+  };
 
   return (
     <div className={`app-root ${showAuthPortal ? 'auth-mode' : 'portal-mode'}`}>
-      {/* Toast Notification Container */}
       {toastMessage && (
         <div className="global-toast-notification" role="alert">
           <span className="material-symbols-outlined toast-icon">info</span>
@@ -37,29 +101,28 @@ const AppContent: React.FC = () => {
           {currentScreen === 'register' ? (
             <Register
               onSwitchToLogin={() => setCurrentScreen('login')}
-              onRegisterSuccess={(_name, _email) => {
-                // As requested: After registration, do not claim server account creation or auto-login.
-                // Redirect user to Login with a prompt to sign in with their demo credentials.
+              onRegisterSuccess={() => {
                 setCurrentScreen('login');
               }}
             />
           ) : currentScreen === 'forgot-password' ? (
-            <ForgotPassword onBackToLogin={() => setCurrentScreen('login')} />
+            <ForgotPassword
+              onBackToLogin={() => setCurrentScreen('login')}
+            />
           ) : (
-            /* Default fallback is always Login */
             <Login
               onSwitchToRegister={() => setCurrentScreen('register')}
-              onSwitchToForgotPassword={() => setCurrentScreen('forgot-password')}
-              onLoginSuccess={() => loginDemoSession()}
+              onSwitchToForgotPassword={() =>
+                setCurrentScreen('forgot-password')
+              }
+              onLoginSuccess={handleLoginSuccess}
             />
           )}
         </div>
       ) : (
         <div className="app-main-layout">
-          {/* Navigation (Sidebar on Desktop, Bottom bar on Mobile) */}
           <Navigation />
 
-          {/* Protected Main View Area */}
           <main className="content-scroll-canvas">
             {currentScreen === 'tasks' ? (
               <Tasks />

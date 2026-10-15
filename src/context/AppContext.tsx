@@ -1,29 +1,34 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Task, WaterLog, UserProfile, AppScreen } from '../types';
+import { api, tokenStorage } from '../services/api';
 
 interface AppContextType {
   isAuthenticated: boolean;
+  loginSession: (email: string, password: string) => Promise<void>;
+  registerSession: (name: string, email: string, password: string) => Promise<void>;
+  logoutSession: () => void;
   loginDemoSession: (userOverride?: Partial<UserProfile>) => void;
   logoutDemoSession: () => void;
   currentScreen: AppScreen;
   setCurrentScreen: (screen: AppScreen) => void;
   user: UserProfile;
-  updateUser: (updates: Partial<UserProfile>) => void;
+  updateUser: (updates: Partial<UserProfile>) => Promise<void>;
   tasks: Task[];
-  addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
-  updateTask: (id: string, updates: Partial<Task>) => void;
-  deleteTask: (id: string) => void;
-  toggleTaskCompleted: (id: string) => void;
+  addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>;
+  updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  toggleTaskCompleted: (id: string) => Promise<void>;
   waterLogs: WaterLog[];
   todayWaterTotal: number;
-  addWaterLog: (amount: number, containerType?: WaterLog['containerType']) => void;
-  deleteWaterLog: (id: string) => void;
-  resetTodayWater: () => void;
+  addWaterLog: (amount: number, containerType?: WaterLog['containerType']) => Promise<void>;
+  deleteWaterLog: (id: string) => Promise<void>;
+  resetTodayWater: () => Promise<void>;
   weeklyWaterData: { day: string; amount: number; goal: number }[];
   notifications: string[];
   clearNotifications: () => void;
   showToast: (message: string) => void;
   toastMessage: string | null;
+  refreshData: () => Promise<void>;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -36,275 +41,227 @@ const DEFAULT_PROFILE: UserProfile = {
   theme: 'light',
 };
 
-const INITIAL_TASKS: Task[] = [
-  {
-    id: 'task-1',
-    title: 'Review quarterly product design sync',
-    description: 'Go over new design tokens and mobile viewport guidelines with the core UX team.',
-    category: 'Work',
-    priority: 'high',
-    dueDate: new Date().toISOString().split('T')[0],
-    dueTime: '11:00',
-    completed: true,
-    reminder: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'task-2',
-    title: 'Hydration check & 10 min stretch',
-    description: 'Drink 300ml of water and stretch back and shoulders.',
-    category: 'Health',
-    priority: 'medium',
-    dueDate: new Date().toISOString().split('T')[0],
-    dueTime: '14:00',
-    completed: true,
-    reminder: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'task-3',
-    title: 'Finalize DayFlow mobile responsiveness',
-    description: 'Ensure bottom navigation bar and card grids scale smoothly on compact phones.',
-    category: 'Work',
-    priority: 'high',
-    dueDate: new Date().toISOString().split('T')[0],
-    dueTime: '16:30',
-    completed: false,
-    reminder: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'task-4',
-    title: 'Evening 5km jog in the park',
-    description: 'Track pace with smartwatch and stay well hydrated.',
-    category: 'Fitness',
-    priority: 'medium',
-    dueDate: new Date().toISOString().split('T')[0],
-    dueTime: '18:30',
-    completed: false,
-    reminder: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'task-5',
-    title: 'Read 2 chapters of "Designing Data-Intensive Apps"',
-    description: 'Keep notes on distributed consensus and transaction isolation levels.',
-    category: 'Personal',
-    priority: 'low',
-    dueDate: new Date().toISOString().split('T')[0],
-    dueTime: '21:00',
-    completed: false,
-    reminder: false,
-    createdAt: new Date().toISOString(),
-  },
-];
-
-const INITIAL_WATER_LOGS: WaterLog[] = [
-  {
-    id: 'wl-1',
-    amount: 350,
-    timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-    timeFormatted: '08:30 AM',
-    containerType: 'glass',
-  },
-  {
-    id: 'wl-2',
-    amount: 500,
-    timestamp: new Date(Date.now() - 2.5 * 3600 * 1000).toISOString(),
-    timeFormatted: '10:00 AM',
-    containerType: 'bottle',
-  },
-  {
-    id: 'wl-3',
-    amount: 250,
-    timestamp: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
-    timeFormatted: '11:45 AM',
-    containerType: 'cup',
-  },
-  {
-    id: 'wl-4',
-    amount: 400,
-    timestamp: new Date().toISOString(),
-    timeFormatted: '01:15 PM',
-    containerType: 'glass',
-  },
-];
-
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Demo session state persisted in localStorage
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('dayflow_auth') === 'true';
+    return !!tokenStorage.get();
   });
 
-  // Load screen safely: if not authenticated, initial screen is always 'login'
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(() => {
-    const isAuth = localStorage.getItem('dayflow_auth') === 'true';
-    if (!isAuth) {
-      return 'login';
-    }
-    const savedScreen = localStorage.getItem('dayflow_screen') as AppScreen;
-    // If authenticated, valid screens are dashboard, tasks, water, settings
-    const validAuthScreens: AppScreen[] = ['dashboard', 'tasks', 'water', 'settings'];
-    return validAuthScreens.includes(savedScreen) ? savedScreen : 'dashboard';
+    const hasToken = !!tokenStorage.get();
+    if (!hasToken) return 'login';
+    const saved = localStorage.getItem('dayflow_screen') as AppScreen;
+    const valid: AppScreen[] = ['dashboard', 'tasks', 'water', 'settings'];
+    return valid.includes(saved) ? saved : 'dashboard';
   });
 
-  const [user, setUser] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('dayflow_user');
-    return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
-  });
-
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('dayflow_tasks');
-    return saved ? JSON.parse(saved) : INITIAL_TASKS;
-  });
-
-  const [waterLogs, setWaterLogs] = useState<WaterLog[]>(() => {
-    const saved = localStorage.getItem('dayflow_water_logs');
-    return saved ? JSON.parse(saved) : INITIAL_WATER_LOGS;
-  });
-
+  const [user, setUser] = useState<UserProfile>(DEFAULT_PROFILE);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [waterLogs, setWaterLogs] = useState<WaterLog[]>([]);
+  const [todayWaterTotal, setTodayWaterTotal] = useState<number>(0);
+  const [weeklyWaterData, setWeeklyWaterData] = useState<{ day: string; amount: number; goal: number }[]>([]);
   const [notifications, setNotifications] = useState<string[]>([
-    'Welcome to DayFlow! You completed 2 tasks this morning.',
-    'Hydration reminder: Time for a refreshing glass of water 💧',
+    'Welcome to DayFlow! Connect your hydration and focus goals.',
   ]);
-
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sync session and screen to LocalStorage
-  useEffect(() => {
-    localStorage.setItem('dayflow_auth', isAuthenticated ? 'true' : 'false');
-  }, [isAuthenticated]);
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage((prev) => (prev === message ? null : prev));
+    }, 3500);
 
+    if (user.notificationsEnabled && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('DayFlow', { body: message, icon: '/vite.svg' });
+      }
+    }
+  }, [user.notificationsEnabled]);
+
+  const refreshData = useCallback(async () => {
+    if (!tokenStorage.get()) return;
+    try {
+      const [profileData, tasksData, logsData, summaryData] = await Promise.all([
+        api.getProfile(),
+        api.getTasks(),
+        api.getWaterLogs(),
+        api.getWaterSummary(),
+      ]);
+
+      setUser(profileData);
+      setTasks(tasksData);
+      setWaterLogs(logsData);
+      setTodayWaterTotal(summaryData.todayTotal);
+      setWeeklyWaterData(summaryData.weeklyHistory);
+    } catch {
+      // In case session expired or backend down
+    }
+  }, []);
+
+  // Fetch initial data when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshData();
+    }
+  }, [isAuthenticated, refreshData]);
+
+  // Sync screen to storage
   useEffect(() => {
     localStorage.setItem('dayflow_screen', currentScreen);
   }, [currentScreen]);
 
+  // Hydration interval reminder timer (runs while app is active in browser)
+  useEffect(() => {
+    if (!isAuthenticated || !user.notificationsEnabled || !user.waterReminderFrequency) return;
+
+    const intervalMs = Math.max(15, user.waterReminderFrequency) * 60 * 1000;
+    const timer = setInterval(() => {
+      showToast('Hydration check: Time for a refreshing glass of water! 💧');
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [isAuthenticated, user.notificationsEnabled, user.waterReminderFrequency, showToast]);
+
+  const loginSession = async (email: string, password: string) => {
+    const res = await api.login({ email, password });
+    tokenStorage.set(res.token);
+    setUser(res.user);
+    setIsAuthenticated(true);
+    setCurrentScreen('dashboard');
+    showToast(`Welcome back, ${res.user.name || 'friend'}!`);
+    await refreshData();
+  };
+
+  const registerSession = async (name: string, email: string, password: string) => {
+    const res = await api.register({ name, email, password });
+    tokenStorage.set(res.token);
+    setUser(res.user);
+    setIsAuthenticated(true);
+    setCurrentScreen('dashboard');
+    showToast(`Account created! Welcome to DayFlow, ${res.user.name}! 🎉`);
+    await refreshData();
+  };
+
+  const logoutSession = () => {
+    tokenStorage.clear();
+    localStorage.removeItem('dayflow_token');
+    setIsAuthenticated(false);
+    setUser(DEFAULT_PROFILE);
+    setTasks([]);
+    setWaterLogs([]);
+    setTodayWaterTotal(0);
+    setCurrentScreen('login');
+    showToast('Logged out safely.');
+  };
+
   const loginDemoSession = (userOverride?: Partial<UserProfile>) => {
     setIsAuthenticated(true);
-    localStorage.setItem('dayflow_auth', 'true');
     if (userOverride) {
       setUser((prev) => ({ ...prev, ...userOverride }));
     }
     setCurrentScreen('dashboard');
+    refreshData();
   };
 
   const logoutDemoSession = () => {
-    setIsAuthenticated(false);
-    localStorage.setItem('dayflow_auth', 'false');
-    localStorage.removeItem('dayflow_screen');
-    setCurrentScreen('login');
+    logoutSession();
   };
 
-  useEffect(() => {
-    localStorage.setItem('dayflow_user', JSON.stringify(user));
-  }, [user]);
-
-  useEffect(() => {
-    localStorage.setItem('dayflow_tasks', JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
-    localStorage.setItem('dayflow_water_logs', JSON.stringify(waterLogs));
-  }, [waterLogs]);
-
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    setTimeout(() => {
-      setToastMessage((prev: string | null) => (prev === message ? null : prev));
-    }, 3500);
-
-    // Browser Notification API if enabled
-    if (user.notificationsEnabled && 'Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('DayFlow Alert', { body: message, icon: '/vite.svg' });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then((permission) => {
-          if (permission === 'granted') {
-            new Notification('DayFlow Alert', { body: message, icon: '/vite.svg' });
-          }
-        });
-      }
+  const updateUser = async (updates: Partial<UserProfile>) => {
+    try {
+      const updated = await api.updateSettings(updates);
+      setUser(updated);
+      showToast('Preferences updated successfully');
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to update preferences');
+      throw err;
     }
   };
 
-  const updateUser = (updates: Partial<UserProfile>) => {
-    setUser((prev) => ({ ...prev, ...updates }));
-    showToast('Preferences updated successfully');
+  const addTask = async (newTaskData: Omit<Task, 'id' | 'createdAt'>) => {
+    try {
+      const created = await api.createTask(newTaskData);
+      setTasks((prev) => [created, ...prev]);
+      showToast(`Task "${created.title}" created!`);
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to create task');
+      throw err;
+    }
   };
 
-  const addTask = (newTaskData: Omit<Task, 'id' | 'createdAt'>) => {
-    const newTask: Task = {
-      ...newTaskData,
-      id: 'task-' + Date.now(),
-      createdAt: new Date().toISOString(),
-    };
-    setTasks((prev) => [newTask, ...prev]);
-    showToast(`Task "${newTask.title}" created!`);
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    try {
+      const updated = await api.updateTask(id, updates);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      showToast('Task updated');
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to update task');
+      throw err;
+    }
   };
 
-  const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
-    );
-    showToast('Task updated');
+  const toggleTaskCompleted = async (id: string) => {
+    try {
+      const toggled = await api.toggleTask(id);
+      setTasks((prev) => prev.map((t) => (t.id === id ? toggled : t)));
+      showToast(toggled.completed ? `Completed "${toggled.title}" 🎉` : `Reopened "${toggled.title}"`);
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to toggle task');
+      throw err;
+    }
   };
 
-  const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-    showToast('Task deleted');
+  const deleteTask = async (id: string) => {
+    try {
+      await api.deleteTask(id);
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+      showToast('Task deleted');
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to delete task');
+      throw err;
+    }
   };
 
-  const toggleTaskCompleted = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const updatedStatus = !t.completed;
-          showToast(updatedStatus ? `Completed "${t.title}" 🎉` : `Reopened "${t.title}"`);
-          return { ...t, completed: updatedStatus };
-        }
-        return t;
-      })
-    );
+  const addWaterLog = async (amount: number, containerType: WaterLog['containerType'] = 'glass') => {
+    try {
+      const created = await api.addWaterLog({ amount, containerType });
+      setWaterLogs((prev) => [created, ...prev]);
+      showToast(`Logged +${amount} ml of water 💧`);
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to log water');
+      throw err;
+    }
   };
 
-  const todayWaterTotal = waterLogs.reduce((acc, log) => acc + log.amount, 0);
-
-  const addWaterLog = (amount: number, containerType: WaterLog['containerType'] = 'glass') => {
-    const now = new Date();
-    const timeFormatted = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const newLog: WaterLog = {
-      id: 'wl-' + Date.now(),
-      amount,
-      timestamp: now.toISOString(),
-      timeFormatted,
-      containerType,
-    };
-    setWaterLogs((prev) => [newLog, ...prev]);
-    showToast(`Logged +${amount} ml of water 💧`);
+  const deleteWaterLog = async (id: string) => {
+    try {
+      await api.deleteWaterLog(id);
+      setWaterLogs((prev) => prev.filter((log) => log.id !== id));
+      showToast('Water log removed');
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to delete water log');
+      throw err;
+    }
   };
 
-  const deleteWaterLog = (id: string) => {
-    setWaterLogs((prev) => prev.filter((log) => log.id !== id));
-    showToast('Water log removed');
+  const resetTodayWater = async () => {
+    try {
+      await api.resetTodayWater();
+      showToast("Today's water intake reset");
+      await refreshData();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to reset water');
+      throw err;
+    }
   };
-
-  const resetTodayWater = () => {
-    setWaterLogs([]);
-    showToast("Today's water intake reset");
-  };
-
-  // Weekly water history data mockup (combining historical days + today's actual)
-  const weeklyWaterData = [
-    { day: 'Mon', amount: 2200, goal: user.dailyWaterGoal },
-    { day: 'Tue', amount: 2600, goal: user.dailyWaterGoal },
-    { day: 'Wed', amount: 1950, goal: user.dailyWaterGoal },
-    { day: 'Thu', amount: 2400, goal: user.dailyWaterGoal },
-    { day: 'Fri', amount: 2100, goal: user.dailyWaterGoal },
-    { day: 'Sat', amount: 2750, goal: user.dailyWaterGoal },
-    { day: 'Sun (Today)', amount: todayWaterTotal, goal: user.dailyWaterGoal },
-  ];
 
   const clearNotifications = () => {
     setNotifications([]);
@@ -314,6 +271,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider
       value={{
         isAuthenticated,
+        loginSession,
+        registerSession,
+        logoutSession,
         loginDemoSession,
         logoutDemoSession,
         currentScreen,
@@ -335,6 +295,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearNotifications,
         showToast,
         toastMessage,
+        refreshData,
       }}
     >
       {children}

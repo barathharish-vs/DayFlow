@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+application-local.properties
+application-*.properties
+**/application-local.properties
+
+
+# Environment variables
+.env
+.env.*
+!.env.example

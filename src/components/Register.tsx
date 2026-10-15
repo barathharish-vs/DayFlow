@@ -1,10 +1,7 @@
+
 import React, { useState } from 'react';
 import './Register.css';
 
-/**
- * TypeScript Interfaces
- * Defines the types for form fields, errors, and component props.
- */
 interface RegisterFormValues {
   fullName: string;
   email: string;
@@ -24,8 +21,10 @@ interface RegisterProps {
   onRegisterSuccess?: (name: string, email: string) => void;
 }
 
-export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
-  // 1. Form state
+export const Register: React.FC<RegisterProps> = ({
+  onSwitchToLogin,
+  onRegisterSuccess,
+}) => {
   const [formValues, setFormValues] = useState<RegisterFormValues>({
     fullName: '',
     email: '',
@@ -33,35 +32,36 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
     confirmPassword: '',
   });
 
-  // 2. Validation errors
   const [errors, setErrors] = useState<RegisterFormErrors>({});
-
-  // 3. Independent password visibility toggles
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-
-  // 4. Simulated success message
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  /**
-   * Password Requirements Checklist Logic (evaluated dynamically)
-   */
   const passwordCriteria = {
     minLength: formValues.password.length >= 8,
-    hasNumberOrSymbol: /[0-9!@#$%^&*(),.?":{}|<>]/.test(formValues.password),
+    hasNumberOrSymbol: /[0-9!@#$%^&*(),.?":{}|<>]/.test(
+      formValues.password
+    ),
     hasUppercase: /[A-Z]/.test(formValues.password),
   };
 
-  /**
-   * Updates state when user inputs values
-   */
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
 
-    // Clear any previous error on this field as user types
     if (errors[name as keyof RegisterFormErrors]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: undefined,
+      }));
     }
+
+    setServerError(null);
+    setSuccessMessage(null);
 
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -69,26 +69,25 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
     }));
   };
 
-  /**
-   * Validates form submission
-   */
   const validateForm = (): boolean => {
     const newErrors: RegisterFormErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Full Name validation
     if (!formValues.fullName.trim()) {
       newErrors.fullName = 'Full Name is required.';
+    } else if (
+      formValues.fullName.trim().length < 2 ||
+      formValues.fullName.trim().length > 100
+    ) {
+      newErrors.fullName = 'Name must be between 2 and 100 characters.';
     }
 
-    // Email validation
     if (!formValues.email.trim()) {
       newErrors.email = 'Email Address is required.';
     } else if (!emailRegex.test(formValues.email.trim())) {
       newErrors.email = 'Please enter a valid email address.';
     }
 
-    // Password validation
     if (!formValues.password) {
       newErrors.password = 'Password is required.';
     } else if (
@@ -97,9 +96,10 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
       !passwordCriteria.hasUppercase
     ) {
       newErrors.password = 'Password must meet all requirements below.';
+    } else if (formValues.password.length > 100) {
+      newErrors.password = 'Password must not exceed 100 characters.';
     }
 
-    // Confirm Password validation
     if (!formValues.confirmPassword) {
       newErrors.confirmPassword = 'Confirm Password is required.';
     } else if (formValues.password !== formValues.confirmPassword) {
@@ -110,60 +110,128 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handles form submit
-   */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     setSuccessMessage(null);
+    setServerError(null);
 
-    const isValid = validateForm();
-    if (isValid) {
-      setSuccessMessage('Account created successfully! Taking you into DayFlow...');
-      setTimeout(() => {
+    if (isSubmitting) {
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formValues.fullName.trim(),
+          email: formValues.email.trim(),
+          password: formValues.password,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        let errorMsg = data?.message || data?.error;
+        if (data?.errors && typeof data.errors === 'object') {
+          errorMsg = Object.values(data.errors).join(', ');
+        }
+        if (!errorMsg) {
+          if (response.status === 500 || response.status === 502 || response.status === 504) {
+            errorMsg = 'Backend server is not running on port 8080. Please start the backend.';
+          } else {
+            errorMsg = 'Registration failed. Please check your details and try again.';
+          }
+        }
+        setServerError(errorMsg);
+        return;
+      }
+
+      setSuccessMessage(
+        'Account created successfully! Please sign in.'
+      );
+
+      window.setTimeout(() => {
         setSuccessMessage(null);
+
         if (onRegisterSuccess) {
-          onRegisterSuccess(formValues.fullName, formValues.email);
+          onRegisterSuccess(
+            formValues.fullName.trim(),
+            formValues.email.trim()
+          );
         } else {
           onSwitchToLogin();
         }
       }, 700);
+    } catch {
+      setServerError(
+        'Cannot connect to the server. Please check that the backend is running.'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="register-page">
       <main className="register-card">
-        {/* Brand Header */}
         <header className="register-header">
           <div className="register-logo-badge" aria-hidden="true">
             <span className="material-symbols-outlined">bolt</span>
           </div>
+
           <h1 className="register-title">DayFlow</h1>
-          <p className="register-subtitle">Get started with DayFlow</p>
+          <p className="register-subtitle">
+            Get started with DayFlow
+          </p>
         </header>
 
-        {/* Success Feedback Banner */}
         {successMessage && (
           <div className="form-success-banner" role="status">
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '18px' }}
+            >
               check_circle
             </span>
             <span>{successMessage}</span>
           </div>
         )}
 
-        {/* Register Form */}
-        <form className="register-form" onSubmit={handleSubmit} noValidate>
-          {/* Full Name Field */}
+        {serverError && (
+          <div className="field-error-text" role="alert">
+            {serverError}
+          </div>
+        )}
+
+        <form
+          className="register-form"
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <div className="form-group">
             <label className="form-label" htmlFor="register-name">
               Full Name
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
-                <span className="material-symbols-outlined">person</span>
+                <span className="material-symbols-outlined">
+                  person
+                </span>
               </span>
+
               <input
                 id="register-name"
                 name="fullName"
@@ -174,25 +242,33 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
                 onChange={handleInputChange}
                 autoComplete="name"
                 aria-invalid={errors.fullName ? 'true' : 'false'}
-                aria-describedby={errors.fullName ? 'register-name-error' : undefined}
+                aria-describedby={
+                  errors.fullName ? 'register-name-error' : undefined
+                }
               />
             </div>
+
             {errors.fullName && (
-              <span id="register-name-error" className="field-error-text" role="alert">
+              <span
+                id="register-name-error"
+                className="field-error-text"
+                role="alert"
+              >
                 {errors.fullName}
               </span>
             )}
           </div>
 
-          {/* Email Address Field */}
           <div className="form-group">
             <label className="form-label" htmlFor="register-email">
               Email Address
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
                 <span className="material-symbols-outlined">mail</span>
               </span>
+
               <input
                 id="register-email"
                 name="email"
@@ -203,25 +279,33 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
                 onChange={handleInputChange}
                 autoComplete="email"
                 aria-invalid={errors.email ? 'true' : 'false'}
-                aria-describedby={errors.email ? 'register-email-error' : undefined}
+                aria-describedby={
+                  errors.email ? 'register-email-error' : undefined
+                }
               />
             </div>
+
             {errors.email && (
-              <span id="register-email-error" className="field-error-text" role="alert">
+              <span
+                id="register-email-error"
+                className="field-error-text"
+                role="alert"
+              >
                 {errors.email}
               </span>
             )}
           </div>
 
-          {/* Password Field */}
           <div className="form-group">
             <label className="form-label" htmlFor="register-password">
               Password
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
                 <span className="material-symbols-outlined">lock</span>
               </span>
+
               <input
                 id="register-password"
                 name="password"
@@ -232,12 +316,17 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
                 onChange={handleInputChange}
                 autoComplete="new-password"
                 aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={errors.password ? 'register-password-error' : undefined}
+                aria-describedby={
+                  errors.password ? 'register-password-error' : undefined
+                }
               />
+
               <button
                 type="button"
                 className="input-toggle-btn"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={
+                  showPassword ? 'Hide password' : 'Show password'
+                }
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 <span className="material-symbols-outlined">
@@ -245,22 +334,33 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
                 </span>
               </button>
             </div>
+
             {errors.password && (
-              <span id="register-password-error" className="field-error-text" role="alert">
+              <span
+                id="register-password-error"
+                className="field-error-text"
+                role="alert"
+              >
                 {errors.password}
               </span>
             )}
           </div>
 
-          {/* Confirm Password Field */}
           <div className="form-group">
-            <label className="form-label" htmlFor="register-confirm-password">
+            <label
+              className="form-label"
+              htmlFor="register-confirm-password"
+            >
               Confirm Password
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
-                <span className="material-symbols-outlined">lock_reset</span>
+                <span className="material-symbols-outlined">
+                  lock_reset
+                </span>
               </span>
+
               <input
                 id="register-confirm-password"
                 name="confirmPassword"
@@ -270,73 +370,112 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterS
                 value={formValues.confirmPassword}
                 onChange={handleInputChange}
                 autoComplete="new-password"
-                aria-invalid={errors.confirmPassword ? 'true' : 'false'}
-                aria-describedby={errors.confirmPassword ? 'register-confirm-password-error' : undefined}
+                aria-invalid={
+                  errors.confirmPassword ? 'true' : 'false'
+                }
+                aria-describedby={
+                  errors.confirmPassword
+                    ? 'register-confirm-password-error'
+                    : undefined
+                }
               />
+
               <button
                 type="button"
                 className="input-toggle-btn"
-                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={
+                  showConfirmPassword
+                    ? 'Hide confirm password'
+                    : 'Show confirm password'
+                }
+                onClick={() =>
+                  setShowConfirmPassword((prev) => !prev)
+                }
               >
                 <span className="material-symbols-outlined">
-                  {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                  {showConfirmPassword
+                    ? 'visibility_off'
+                    : 'visibility'}
                 </span>
               </button>
             </div>
+
             {errors.confirmPassword && (
-              <span id="register-confirm-password-error" className="field-error-text" role="alert">
+              <span
+                id="register-confirm-password-error"
+                className="field-error-text"
+                role="alert"
+              >
                 {errors.confirmPassword}
               </span>
             )}
           </div>
 
-          {/* Dynamic Password Requirements Checklist Box */}
           <div className="password-requirements-box" aria-live="polite">
-            <p className="requirements-title">Password requirements:</p>
+            <p className="requirements-title">
+              Password requirements:
+            </p>
+
             <ul className="requirements-list">
-              <li className={`requirement-item ${passwordCriteria.minLength ? 'met' : ''}`}>
+              <li
+                className={`requirement-item ${passwordCriteria.minLength ? 'met' : ''}`}
+              >
                 <span
                   className={`material-symbols-outlined requirement-icon ${
                     passwordCriteria.minLength ? 'met' : 'unmet'
                   }`}
                 >
-                  {passwordCriteria.minLength ? 'check_circle' : 'radio_button_unchecked'}
+                  {passwordCriteria.minLength
+                    ? 'check_circle'
+                    : 'radio_button_unchecked'}
                 </span>
                 <span>At least 8 characters long</span>
               </li>
-              <li className={`requirement-item ${passwordCriteria.hasNumberOrSymbol ? 'met' : ''}`}>
+
+              <li
+                className={`requirement-item ${passwordCriteria.hasNumberOrSymbol ? 'met' : ''}`}
+              >
                 <span
                   className={`material-symbols-outlined requirement-icon ${
                     passwordCriteria.hasNumberOrSymbol ? 'met' : 'unmet'
                   }`}
                 >
-                  {passwordCriteria.hasNumberOrSymbol ? 'check_circle' : 'radio_button_unchecked'}
+                  {passwordCriteria.hasNumberOrSymbol
+                    ? 'check_circle'
+                    : 'radio_button_unchecked'}
                 </span>
                 <span>Contains a number or symbol</span>
               </li>
-              <li className={`requirement-item ${passwordCriteria.hasUppercase ? 'met' : ''}`}>
+
+              <li
+                className={`requirement-item ${passwordCriteria.hasUppercase ? 'met' : ''}`}
+              >
                 <span
                   className={`material-symbols-outlined requirement-icon ${
                     passwordCriteria.hasUppercase ? 'met' : 'unmet'
                   }`}
                 >
-                  {passwordCriteria.hasUppercase ? 'check_circle' : 'radio_button_unchecked'}
+                  {passwordCriteria.hasUppercase
+                    ? 'check_circle'
+                    : 'radio_button_unchecked'}
                 </span>
                 <span>At least one uppercase letter</span>
               </li>
             </ul>
           </div>
 
-          {/* Create Account Submit Button */}
-          <button type="submit" className="submit-btn">
-            Create Account
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
-        {/* Footer Link to Sign In */}
         <footer className="register-footer">
           <span>Already have an account?</span>
+
           <a
             href="#sign-in"
             className="sign-in-link"

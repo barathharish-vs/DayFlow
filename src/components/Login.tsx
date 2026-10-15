@@ -1,10 +1,7 @@
+
 import React, { useState } from 'react';
 import './Login.css';
 
-/**
- * TypeScript Interfaces
- * These define the "shape" of our form data and errors so TypeScript can catch mistakes.
- */
 interface LoginFormValues {
   email: string;
   password: string;
@@ -27,54 +24,42 @@ export const Login: React.FC<LoginProps> = ({
   onSwitchToForgotPassword,
   onLoginSuccess,
 }) => {
-  // 1. State for form input values
   const [formValues, setFormValues] = useState<LoginFormValues>({
     email: '',
     password: '',
     rememberMe: false,
   });
 
-  // 2. State for validation errors
   const [errors, setErrors] = useState<LoginFormErrors>({});
-
-  // 3. State to toggle password visibility (show/hide)
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  // 4. State to simulate a successful submission message (without calling a backend)
+  const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  /**
-   * Updates state when user types into an input field or checks a checkbox
-   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    
-    // Clear any previous error on this field as soon as user types
-    if (errors[name as keyof LoginFormErrors]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+
+    if (name in errors) {
+      setErrors((previous) => ({
+        ...previous,
+        [name]: undefined,
+      }));
     }
 
-    setFormValues((prevValues) => ({
-      ...prevValues,
+    setFormValues((previous) => ({
+      ...previous,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  /**
-   * Validates form fields and returns true if all checks pass
-   */
   const validateForm = (): boolean => {
     const newErrors: LoginFormErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Email checks
     if (!formValues.email.trim()) {
       newErrors.email = 'Email address is required.';
     } else if (!emailRegex.test(formValues.email.trim())) {
       newErrors.email = 'Please enter a valid email address.';
     }
 
-    // Password checks
     if (!formValues.password) {
       newErrors.password = 'Password is required.';
     } else if (formValues.password.length < 6) {
@@ -85,58 +70,108 @@ export const Login: React.FC<LoginProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handles form submission
-   */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevents browser from reloading the page
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setSuccessMessage(null);
 
-    const isValid = validateForm();
-    if (isValid) {
-      setSuccessMessage('Validation passed! Taking you to your dashboard...');
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formValues.email.trim(),
+          password: formValues.password,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        let errorMsg = data?.message || data?.error;
+        if (!errorMsg) {
+          if (response.status === 500 || response.status === 502 || response.status === 504) {
+            errorMsg = 'Backend server is not running on port 8080. Please start the backend.';
+          } else {
+            errorMsg = 'Login failed. Please check your email and password.';
+          }
+        }
+        setErrors((previous) => ({
+          ...previous,
+          password: errorMsg,
+        }));
+        return;
+      }
+
+      // Store the authentication token returned by the backend.
+      const token = data?.token ?? data?.accessToken;
+
+      if (typeof token !== 'string' || token.length === 0) {
+        setErrors((previous) => ({
+          ...previous,
+          password:
+            'The server response did not contain a login token. Please check the backend response.',
+        }));
+        return;
+      }
+
+      localStorage.setItem('dayflow_token', token);
+
+      setSuccessMessage('Login successful! Opening your dashboard...');
+
       setTimeout(() => {
         setSuccessMessage(null);
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        }
+        onLoginSuccess?.();
       }, 600);
+    } catch {
+      setErrors((previous) => ({
+        ...previous,
+        password: 'Cannot connect to the server. Please try again.',
+      }));
     }
   };
 
   return (
     <div className="login-page">
       <main className="login-card">
-        {/* Brand Logo & Header */}
         <header className="login-header">
           <div className="login-logo-badge" aria-hidden="true">
             <span className="material-symbols-outlined">bolt</span>
           </div>
           <h1 className="login-title">DayFlow</h1>
-          <p className="login-subtitle">Welcome back! Please enter your details.</p>
+          <p className="login-subtitle">
+            Welcome back! Please enter your details.
+          </p>
         </header>
 
-        {/* Validation Success Feedback Banner */}
         {successMessage && (
           <div className="form-success-banner" role="status">
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '18px' }}
+            >
               check_circle
             </span>
             <span>{successMessage}</span>
           </div>
         )}
 
-        {/* Login Form */}
         <form className="login-form" onSubmit={handleSubmit} noValidate>
-          {/* Email Field */}
           <div className="form-group">
             <label className="form-label" htmlFor="email-input">
               Email address
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
                 <span className="material-symbols-outlined">mail</span>
               </span>
+
               <input
                 id="email-input"
                 name="email"
@@ -150,6 +185,7 @@ export const Login: React.FC<LoginProps> = ({
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
             </div>
+
             {errors.email && (
               <span id="email-error" className="field-error-text" role="alert">
                 {errors.email}
@@ -157,46 +193,56 @@ export const Login: React.FC<LoginProps> = ({
             )}
           </div>
 
-          {/* Password Field */}
           <div className="form-group">
             <label className="form-label" htmlFor="password-input">
               Password
             </label>
+
             <div className="input-wrapper">
               <span className="input-icon-left" aria-hidden="true">
                 <span className="material-symbols-outlined">lock</span>
               </span>
+
               <input
                 id="password-input"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
-                className={`form-input has-right-icon ${errors.password ? 'input-error' : ''}`}
+                className={`form-input has-right-icon ${
+                  errors.password ? 'input-error' : ''
+                }`}
                 placeholder="••••••••"
                 value={formValues.password}
                 onChange={handleInputChange}
                 autoComplete="current-password"
                 aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={errors.password ? 'password-error' : undefined}
+                aria-describedby={
+                  errors.password ? 'password-error' : undefined
+                }
               />
+
               <button
                 type="button"
                 className="input-toggle-btn"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => setShowPassword((prev) => !prev)}
+                onClick={() => setShowPassword((previous) => !previous)}
               >
                 <span className="material-symbols-outlined">
                   {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
               </button>
             </div>
+
             {errors.password && (
-              <span id="password-error" className="field-error-text" role="alert">
+              <span
+                id="password-error"
+                className="field-error-text"
+                role="alert"
+              >
                 {errors.password}
               </span>
             )}
           </div>
 
-          {/* Remember Me Checkbox & Forgot Password Link */}
           <div className="form-options-row">
             <label className="remember-label" htmlFor="remember-checkbox">
               <input
@@ -209,27 +255,24 @@ export const Login: React.FC<LoginProps> = ({
               />
               <span>Remember me</span>
             </label>
+
             <a
               href="#forgot-password"
               className="forgot-password-link"
               onClick={(e) => {
                 e.preventDefault();
-                if (onSwitchToForgotPassword) {
-                  onSwitchToForgotPassword();
-                }
+                onSwitchToForgotPassword?.();
               }}
             >
               Forgot password?
             </a>
           </div>
 
-          {/* Sign In Submit Button */}
           <button type="submit" className="submit-btn">
             Sign In
           </button>
         </form>
 
-        {/* Footer Link to Create Account */}
         <footer className="login-footer">
           <span>Don't have an account?</span>
           <a
@@ -237,11 +280,7 @@ export const Login: React.FC<LoginProps> = ({
             className="create-account-link"
             onClick={(e) => {
               e.preventDefault();
-              if (onSwitchToRegister) {
-                onSwitchToRegister();
-              } else {
-                alert('Registration screen will be connected in a later phase!');
-              }
+              onSwitchToRegister?.();
             }}
           >
             Create Account
