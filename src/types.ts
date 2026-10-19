@@ -10,6 +10,7 @@ export interface Task {
   dueDate: string; // YYYY-MM-DD
   dueTime?: string; // HH:mm
   completed: boolean;
+  completedAt?: string;
   reminder: boolean;
   createdAt: string;
 }
@@ -28,6 +29,8 @@ export interface UserProfile {
   avatarUrl: string;
   dailyWaterGoal: number; // in ml (e.g., 2500)
   notificationsEnabled: boolean;
+  waterRemindersEnabled: boolean;
+  taskRemindersEnabled: boolean;
   waterReminderFrequency: number; // in minutes (e.g. 60)
   theme: 'light' | 'dark' | 'system';
 }
@@ -39,4 +42,6 @@ export type AppScreen =
   | 'dashboard'
   | 'tasks'
   | 'water'
+  | 'water-report'
+  | 'task-report'
   | 'settings';

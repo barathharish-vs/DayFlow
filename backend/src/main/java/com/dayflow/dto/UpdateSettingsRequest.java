@@ -15,6 +15,10 @@ public class UpdateSettingsRequest {
 
     private Boolean notificationsEnabled;
 
+    private Boolean waterRemindersEnabled;
+
+    private Boolean taskRemindersEnabled;
+
     private String theme;
 
     private String timezone;
@@ -43,6 +47,22 @@ public class UpdateSettingsRequest {
 
     public void setNotificationsEnabled(Boolean notificationsEnabled) {
         this.notificationsEnabled = notificationsEnabled;
+    }
+
+    public Boolean getWaterRemindersEnabled() {
+        return waterRemindersEnabled;
+    }
+
+    public void setWaterRemindersEnabled(Boolean waterRemindersEnabled) {
+        this.waterRemindersEnabled = waterRemindersEnabled;
+    }
+
+    public Boolean getTaskRemindersEnabled() {
+        return taskRemindersEnabled;
+    }
+
+    public void setTaskRemindersEnabled(Boolean taskRemindersEnabled) {
+        this.taskRemindersEnabled = taskRemindersEnabled;
     }
 
     public String getTheme() {

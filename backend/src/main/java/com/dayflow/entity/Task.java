@@ -40,6 +40,9 @@ public class Task {
     @Column(nullable = false)
     private Boolean completed = false;
 
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
     @Column(nullable = false)
     private Boolean reminder = false;
 
@@ -132,6 +135,14 @@ public class Task {
 
     public void setCompleted(Boolean completed) {
         this.completed = completed;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 
     public Boolean getReminder() {

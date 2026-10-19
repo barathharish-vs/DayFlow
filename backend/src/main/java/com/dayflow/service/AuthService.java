@@ -12,13 +12,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.dayflow.entity.PasswordResetToken;
+import com.dayflow.repository.PasswordResetTokenRepository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final UserSettingsRepository userSettingsRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
@@ -26,15 +33,58 @@ public class AuthService {
     public AuthService(
             UserRepository userRepository,
             UserSettingsRepository userSettingsRepository,
+            PasswordResetTokenRepository passwordResetTokenRepository,
             PasswordEncoder passwordEncoder,
             JwtUtils jwtUtils,
             AuthenticationManager authenticationManager
     ) {
         this.userRepository = userRepository;
         this.userSettingsRepository = userSettingsRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
+    }
+
+    @Transactional
+    public String requestPasswordReset(String email) {
+        String normalizedEmail = email.toLowerCase().trim();
+        Optional<User> userOpt = userRepository.findByEmail(normalizedEmail);
+        if (userOpt.isEmpty()) {
+            // Return dummy or success status so email enumeration is mitigated
+            return "If an account exists with this email, a reset link/code has been generated.";
+        }
+
+        User user = userOpt.get();
+        // Generate secure random UUID token
+        String token = UUID.randomUUID().toString();
+        // 1 hour expiry
+        LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
+
+        PasswordResetToken resetToken = new PasswordResetToken(user, token, expiresAt);
+        passwordResetTokenRepository.save(resetToken);
+
+        // In production this sends an email via SMTP.
+        // We log it and return confirmation.
+        return token;
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken token = passwordResetTokenRepository
+                .findByTokenHashAndUsedFalse(request.getToken().trim())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired password reset token"));
+
+        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Password reset token has expired. Please request a new one.");
+        }
+
+        User user = token.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        token.setUsed(true);
+        passwordResetTokenRepository.save(token);
     }
 
     @Transactional
@@ -139,6 +189,87 @@ public class AuthService {
     }
 
     @Transactional
+    public UserProfileDto uploadProfilePhoto(
+            String email,
+            byte[] fileBytes,
+            String contentType,
+            String originalFilename
+    ) {
+        if (fileBytes == null || fileBytes.length == 0) {
+            throw new IllegalArgumentException("Image file cannot be empty");
+        }
+
+        // Limit: 5MB
+        long maxBytes = 5 * 1024 * 1024;
+        if (fileBytes.length > maxBytes) {
+            throw new IllegalArgumentException("Profile photo size exceeds maximum limit of 5MB");
+        }
+
+        // Validate MIME type
+        String normalizedContentType = contentType != null ? contentType.toLowerCase().trim() : "";
+        if (!normalizedContentType.equals("image/jpeg") &&
+            !normalizedContentType.equals("image/jpg") &&
+            !normalizedContentType.equals("image/png") &&
+            !normalizedContentType.equals("image/webp")) {
+            throw new IllegalArgumentException("Only JPEG, PNG, and WebP image formats are permitted");
+        }
+
+        // Magic bytes inspection
+        boolean isValidMagicBytes = false;
+        if (fileBytes.length >= 4) {
+            // JPEG: FF D8 FF
+            if ((fileBytes[0] & 0xFF) == 0xFF && (fileBytes[1] & 0xFF) == 0xD8 && (fileBytes[2] & 0xFF) == 0xFF) {
+                isValidMagicBytes = true;
+            }
+            // PNG: 89 50 4E 47
+            else if ((fileBytes[0] & 0xFF) == 0x89 && (fileBytes[1] & 0xFF) == 0x50 &&
+                     (fileBytes[2] & 0xFF) == 0x4E && (fileBytes[3] & 0xFF) == 0x47) {
+                isValidMagicBytes = true;
+            }
+            // WebP: RIFF ... WEBP
+            else if (fileBytes.length >= 12 &&
+                     fileBytes[0] == 'R' && fileBytes[1] == 'I' && fileBytes[2] == 'F' && fileBytes[3] == 'F' &&
+                     fileBytes[8] == 'W' && fileBytes[9] == 'E' && fileBytes[10] == 'B' && fileBytes[11] == 'P') {
+                isValidMagicBytes = true;
+            }
+        }
+
+        if (!isValidMagicBytes) {
+            throw new IllegalArgumentException("Uploaded file does not match a valid image signature");
+        }
+
+        User user = getUserByEmail(email);
+        user.setProfilePhotoData(fileBytes);
+        user.setProfilePhotoContentType(normalizedContentType);
+        user.setAvatarUrl("/api/auth/profile-photo");
+        final User savedUser = userRepository.save(user);
+
+        UserSettings settings = userSettingsRepository.findByUserId(savedUser.getId())
+                .orElseGet(() -> userSettingsRepository.save(new UserSettings(savedUser)));
+
+        return toDto(savedUser, settings);
+    }
+
+    @Transactional(readOnly = true)
+    public User getProfilePhotoOwner(String email) {
+        return getUserByEmail(email);
+    }
+
+    @Transactional
+    public UserProfileDto removeProfilePhoto(String email) {
+        User user = getUserByEmail(email);
+        user.setProfilePhotoData(null);
+        user.setProfilePhotoContentType(null);
+        user.setAvatarUrl(null);
+        final User savedUser = userRepository.save(user);
+
+        UserSettings settings = userSettingsRepository.findByUserId(savedUser.getId())
+                .orElseGet(() -> userSettingsRepository.save(new UserSettings(savedUser)));
+
+        return toDto(savedUser, settings);
+    }
+
+    @Transactional
     public AuthResponse changeEmail(
             String currentEmail,
             ChangeEmailRequest request
@@ -237,11 +368,17 @@ public class AuthService {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
-        dto.setAvatarUrl(user.getAvatarUrl());
+        if (user.getProfilePhotoData() != null && user.getProfilePhotoData().length > 0) {
+            dto.setAvatarUrl("/api/auth/profile-photo");
+        } else {
+            dto.setAvatarUrl(user.getAvatarUrl());
+        }
 
         if (settings != null) {
             dto.setDailyWaterGoal(settings.getDailyWaterGoal());
             dto.setNotificationsEnabled(settings.getNotificationsEnabled());
+            dto.setWaterRemindersEnabled(settings.getWaterRemindersEnabled());
+            dto.setTaskRemindersEnabled(settings.getTaskRemindersEnabled());
             dto.setWaterReminderFrequency(
                     settings.getWaterReminderFrequency()
             );

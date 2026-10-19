@@ -31,6 +31,215 @@
   --radius-xl: 16px;
 }
 
+/* DayFlow Dark Theme Tokens */
+[data-theme='dark'] {
+  --color-canvas: #0b1120;
+  --color-surface: #1e293b;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-container: #1e3a8a;
+  --color-on-primary: #ffffff;
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-text-placeholder: #64748b;
+  --color-border: #334155;
+  --color-border-focus: #3b82f6;
+  --color-error: #f87171;
+  --color-error-bg: #450a0a;
+  --color-error-text: #fecaca;
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Theme Overrides for Core UI Elements across the entire app */
+[data-theme='dark'] body,
+[data-theme='dark'] .portal-mode,
+[data-theme='dark'] .content-scroll-canvas,
+[data-theme='dark'] .auth-mode {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .app-sidebar,
+[data-theme='dark'] .mobile-bottom-nav {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+[data-theme='dark'] .sidebar-brand-name {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .nav-link-btn {
+  color: #94a3b8 !important;
+}
+
+[data-theme='dark'] .nav-link-btn:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .nav-link-btn.active {
+  background-color: #1e3a8a !important;
+  color: #93c5fd !important;
+}
+
+[data-theme='dark'] .sidebar-profile {
+  border-top-color: #1e293b !important;
+}
+
+[data-theme='dark'] .sidebar-profile-name {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .sidebar-profile-email {
+  color: #64748b !important;
+}
+
+[data-theme='dark'] .greeting-title,
+[data-theme='dark'] .tasks-main-title,
+[data-theme='dark'] .water-title,
+[data-theme='dark'] .report-main-title,
+[data-theme='dark'] .settings-main-title,
+[data-theme='dark'] .login-title,
+[data-theme='dark'] .register-title,
+[data-theme='dark'] .card-heading,
+[data-theme='dark'] .section-card-title,
+[data-theme='dark'] .stat-metric-large,
+[data-theme='dark'] .metric-large,
+[data-theme='dark'] .brand-title {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .stat-card,
+[data-theme='dark'] .task-item-card,
+[data-theme='dark'] .settings-section-card,
+[data-theme='dark'] .report-card,
+[data-theme='dark'] .water-hero-card,
+[data-theme='dark'] .water-card,
+[data-theme='dark'] .login-card,
+[data-theme='dark'] .register-card,
+[data-theme='dark'] .forgot-password-card,
+[data-theme='dark'] .quick-task-modal-card,
+[data-theme='dark'] .task-modal-card,
+[data-theme='dark'] .report-stat-card,
+[data-theme='dark'] .week-selector-bar {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .progress-bar-track,
+[data-theme='dark'] .day-bar-bg,
+[data-theme='dark'] .table-bar-track {
+  background-color: #334155 !important;
+}
+
+[data-theme='dark'] .secondary-btn,
+[data-theme='dark'] .action-outline-btn,
+[data-theme='dark'] .cancel-btn,
+[data-theme='dark'] .week-nav-btn {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme='dark'] .secondary-btn:hover,
+[data-theme='dark'] .action-outline-btn:hover,
+[data-theme='dark'] .cancel-btn:hover,
+[data-theme='dark'] .week-nav-btn:hover:not(:disabled) {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .field-input,
+[data-theme='dark'] .field-select,
+[data-theme='dark'] .modal-input,
+[data-theme='dark'] .modal-select,
+[data-theme='dark'] .modal-textarea,
+[data-theme='dark'] .form-input,
+[data-theme='dark'] .text-input,
+[data-theme='dark'] .search-input {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .field-label,
+[data-theme='dark'] .input-label,
+[data-theme='dark'] .form-label,
+[data-theme='dark'] .settings-subtext,
+[data-theme='dark'] .tasks-subtext,
+[data-theme='dark'] .water-subtitle,
+[data-theme='dark'] .report-subtext,
+[data-theme='dark'] .login-subtitle,
+[data-theme='dark'] .register-subtitle,
+[data-theme='dark'] .forgot-subtitle,
+[data-theme='dark'] .section-card-desc,
+[data-theme='dark'] .stat-card-title,
+[data-theme='dark'] .current-date-badge {
+  color: #94a3b8 !important;
+}
+
+[data-theme='dark'] .preset-btn {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .preset-btn:hover {
+  background-color: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+}
+
+[data-theme='dark'] .agenda-task-item,
+[data-theme='dark'] .daily-audit-table tr {
+  border-color: #334155 !important;
+}
+
+[data-theme='dark'] .agenda-task-item {
+  background-color: #0f172a !important;
+}
+
+[data-theme='dark'] .agenda-task-title {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .daily-audit-table th {
+  color: #94a3b8 !important;
+  border-bottom-color: #334155 !important;
+}
+
+[data-theme='dark'] .daily-audit-table td {
+  border-bottom-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme='dark'] .daily-audit-table td strong {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .week-range-display {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .pill-neutral {
+  background-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme='dark'] .danger-zone-card {
+  border-color: #7f1d1d !important;
+}
+
+[data-theme='dark'] .danger-actions-row .action-outline-btn {
+  border-color: #475569 !important;
+}
+
+[data-theme='dark'] .pwa-install-card {
+  border-color: #334155 !important;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }

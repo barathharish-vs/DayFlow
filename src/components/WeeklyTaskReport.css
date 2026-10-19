@@ -1,0 +1,196 @@
+.weekly-task-report-page {
+  padding: 2rem 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.purple-badge {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.task-purple { background: #f3e8ff; color: #7e22ce; }
+.task-green { background: #dcfce7; color: #16a34a; }
+.task-blue { background: #e0f2fe; color: #0284c7; }
+.task-amber { background: #fef3c7; color: #d97706; }
+
+.legend-items {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.due-dot { background: #94a3b8; }
+.done-dot { background: #10b981; }
+
+.task-bars-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 220px;
+  padding: 1rem 0.5rem 0.5rem 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chart-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.dual-bars-track {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.sub-bar {
+  width: 12px;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+}
+
+.due-bar {
+  background: #cbd5e1;
+}
+
+.done-bar {
+  background: #10b981;
+}
+
+.priority-pills-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.priority-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.825rem;
+  font-weight: 600;
+}
+
+.priority-pill .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.pill-high { background: #fee2e2; color: #b91c1c; }
+.pill-med { background: #fef3c7; color: #b45309; }
+.pill-low { background: #f1f5f9; color: #475569; }
+
+.agenda-section-title {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.agenda-section-title.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.agenda-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.agenda-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.agenda-task-item.done .agenda-task-title {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.check-ico { color: #16a34a; font-size: 20px; }
+.radio-ico { color: #94a3b8; font-size: 20px; }
+
+.agenda-task-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda-task-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.agenda-task-meta {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.priority-tiny-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+.pri-high { background: #fee2e2; color: #b91c1c; }
+.pri-medium { background: #fef3c7; color: #b45309; }
+.pri-low { background: #f1f5f9; color: #475569; }
+
+.empty-subtext {
+  font-size: 0.825rem;
+  color: #94a3b8;
+  margin: 0;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .weekly-task-report-page {
+    padding: 1.25rem 1rem 5.5rem 1rem;
+  }
+  .task-bars-chart {
+    height: 180px;
+    padding: 0.5rem 0.25rem;
+  }
+  .sub-bar {
+    width: 8px;
+  }
+  .dual-bars-track {
+    gap: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .priority-pills-row {
+    flex-direction: column;
+  }
+  .priority-pill {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

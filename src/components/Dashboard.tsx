@@ -21,12 +21,68 @@ export const Dashboard: React.FC = () => {
   const [quickPriority, setQuickPriority] = useState<Priority>('medium');
 
   // Stats calculation
+  const todayStr = new Date().toISOString().split('T')[0];
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.completed).length;
+  const overdueTasks = tasks.filter((t) => !t.completed && t.dueDate < todayStr).length;
   const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  // Today's Focus Tasks: Due today or pending priority, sorted by priority and due time
+  const priorityWeight: Record<Priority, number> = { high: 3, medium: 2, low: 1 };
+  const sortedFocusTasks = [...tasks]
+    .filter((t) => !t.completed || t.dueDate === todayStr)
+    .sort((a, b) => {
+      // Pending first
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+      // High priority first
+      const pDiff = (priorityWeight[b.priority] || 2) - (priorityWeight[a.priority] || 2);
+      if (pDiff !== 0) return pDiff;
+      // Due date/time
+      return (a.dueDate + (a.dueTime || '99:99')).localeCompare(b.dueDate + (b.dueTime || '99:99'));
+    });
 
   const waterGoal = user.dailyWaterGoal;
   const waterPercentage = Math.min(100, Math.round((todayWaterTotal / waterGoal) * 100));
+
+  // Helper for dynamic time-based greeting based on device local time
+  const getGreetingData = (): { text: string; icon: string } => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return { text: 'Good morning', icon: '☀️' };
+    } else if (hour >= 12 && hour < 17) {
+      return { text: 'Good afternoon', icon: '🌤️' };
+    } else if (hour >= 17 && hour < 21) {
+      return { text: 'Good evening', icon: '🌆' };
+    } else {
+      return { text: 'Good night', icon: '🌙' };
+    }
+  };
+
+  const [greeting, setGreeting] = useState(getGreetingData);
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+
+  React.useEffect(() => {
+    const updateTime = () => {
+      setGreeting(getGreetingData());
+      setCurrentDate(new Date());
+    };
+
+    // Update greeting immediately when browser tab becomes visible/active again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateTime();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Interval check every 30 seconds to catch greeting boundary changes cleanly
+    const interval = setInterval(updateTime, 30000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Today's formatted date
   const todayFormatted = new Intl.DateTimeFormat('en-US', {
@@ -34,7 +90,7 @@ export const Dashboard: React.FC = () => {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
-  }).format(new Date());
+  }).format(currentDate);
 
   const handleCreateQuickTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +114,9 @@ export const Dashboard: React.FC = () => {
       {/* Top Header */}
       <header className="dashboard-header">
         <div className="header-greeting">
-          <h1 className="greeting-title">Good morning, {user.name.split(' ')[0]}! ☀️</h1>
+          <h1 className="greeting-title">
+            {greeting.text}{user?.name ? `, ${user.name.trim().split(' ')[0]}` : ''}! {greeting.icon}
+          </h1>
           <span className="current-date-badge">{todayFormatted}</span>
         </div>
 
@@ -100,7 +158,13 @@ export const Dashboard: React.FC = () => {
               <span className="material-symbols-outlined">trending_up</span>
               {taskCompletionRate}% done today
             </span>
-            <span className="card-link-hint">View Tasks →</span>
+            {overdueTasks > 0 ? (
+              <span className="card-link-hint" style={{ color: '#ef4444', fontWeight: 600 }}>
+                ⚠️ {overdueTasks} overdue
+              </span>
+            ) : (
+              <span className="card-link-hint">View Tasks →</span>
+            )}
           </div>
         </div>
 
@@ -181,50 +245,75 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="task-items-list">
-            {tasks.slice(0, 4).map((task) => (
-              <div
-                key={task.id}
-                className={`task-row ${task.completed ? 'task-done' : ''}`}
-              >
-                <button
-                  type="button"
-                  className={`task-check-circle ${task.completed ? 'checked' : ''}`}
-                  onClick={() => toggleTaskCompleted(task.id)}
-                  aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
-                >
-                  {task.completed && (
-                    <span className="material-symbols-outlined">check</span>
-                  )}
-                </button>
+            {sortedFocusTasks.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>
+                🎉 All tasks completed or no tasks scheduled for today!
+              </p>
+            ) : (
+              sortedFocusTasks.slice(0, 5).map((task) => {
+                const isOverdue = !task.completed && task.dueDate < todayStr;
+                return (
+                  <div
+                    key={task.id}
+                    className={`task-row ${task.completed ? 'task-done' : ''}`}
+                  >
+                    <button
+                      type="button"
+                      className={`task-check-circle ${task.completed ? 'checked' : ''}`}
+                      onClick={() => toggleTaskCompleted(task.id)}
+                      aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
+                    >
+                      {task.completed && (
+                        <span className="material-symbols-outlined">check</span>
+                      )}
+                    </button>
 
-                <div className="task-row-content">
-                  <div className="task-row-title-bar">
-                    <span className="task-title-text">{task.title}</span>
-                    <span className={`priority-tag priority-${task.priority}`}>
-                      {task.priority}
-                    </span>
+                    <div className="task-row-content">
+                      <div className="task-row-title-bar">
+                        <span className="task-title-text">{task.title}</span>
+                        <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+                          {isOverdue && (
+                            <span
+                              style={{
+                                fontSize: '0.7rem',
+                                padding: '0.15rem 0.4rem',
+                                borderRadius: '4px',
+                                background: '#fee2e2',
+                                color: '#b91c1c',
+                                fontWeight: 600,
+                              }}
+                            >
+                              Overdue
+                            </span>
+                          )}
+                          <span className={`priority-tag priority-${task.priority}`}>
+                            {task.priority}
+                          </span>
+                        </div>
+                      </div>
+                      {task.description && (
+                        <p className="task-desc-text">{task.description}</p>
+                      )}
+                      <div className="task-meta-bar">
+                        <span className="meta-tag category-badge">{task.category}</span>
+                        {task.dueTime && (
+                          <span className="meta-tag time-badge">
+                            <span className="material-symbols-outlined">schedule</span>
+                            {task.dueTime}
+                          </span>
+                        )}
+                        {task.reminder && (
+                          <span className="meta-tag reminder-badge">
+                            <span className="material-symbols-outlined">notifications_active</span>
+                            Reminder on
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  {task.description && (
-                    <p className="task-desc-text">{task.description}</p>
-                  )}
-                  <div className="task-meta-bar">
-                    <span className="meta-tag category-badge">{task.category}</span>
-                    {task.dueTime && (
-                      <span className="meta-tag time-badge">
-                        <span className="material-symbols-outlined">schedule</span>
-                        {task.dueTime}
-                      </span>
-                    )}
-                    {task.reminder && (
-                      <span className="meta-tag reminder-badge">
-                        <span className="material-symbols-outlined">notifications_active</span>
-                        Reminder on
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </section>
 

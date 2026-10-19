@@ -24,6 +24,12 @@ public class UserSettings {
     @Column(name = "notifications_enabled", nullable = false)
     private Boolean notificationsEnabled = true;
 
+    @Column(name = "water_reminders_enabled", nullable = false)
+    private Boolean waterRemindersEnabled = true;
+
+    @Column(name = "task_reminders_enabled", nullable = false)
+    private Boolean taskRemindersEnabled = true;
+
     @Column(nullable = false, length = 20)
     private String theme = "light";
 
@@ -91,6 +97,22 @@ public class UserSettings {
 
     public void setNotificationsEnabled(Boolean notificationsEnabled) {
         this.notificationsEnabled = notificationsEnabled;
+    }
+
+    public Boolean getWaterRemindersEnabled() {
+        return waterRemindersEnabled;
+    }
+
+    public void setWaterRemindersEnabled(Boolean waterRemindersEnabled) {
+        this.waterRemindersEnabled = waterRemindersEnabled;
+    }
+
+    public Boolean getTaskRemindersEnabled() {
+        return taskRemindersEnabled;
+    }
+
+    public void setTaskRemindersEnabled(Boolean taskRemindersEnabled) {
+        this.taskRemindersEnabled = taskRemindersEnabled;
     }
 
     public String getTheme() {

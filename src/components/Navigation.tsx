@@ -1,9 +1,10 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import UserAvatar from './UserAvatar';
 import './Navigation.css';
 
 interface NavItem {
-  id: 'dashboard' | 'tasks' | 'water' | 'settings';
+  id: 'dashboard' | 'tasks' | 'water' | 'water-report' | 'task-report' | 'settings';
   label: string;
   icon: string;
   badge?: number;
@@ -32,6 +33,16 @@ export const Navigation: React.FC = () => {
       icon: 'water_drop',
     },
     {
+      id: 'water-report',
+      label: 'Water Report',
+      icon: 'bar_chart',
+    },
+    {
+      id: 'task-report',
+      label: 'To-Do Report',
+      icon: 'analytics',
+    },
+    {
       id: 'settings',
       label: 'Settings',
       icon: 'settings',
@@ -46,7 +57,7 @@ export const Navigation: React.FC = () => {
           {/* Logo & App Name */}
           <div className="sidebar-brand">
             <div className="sidebar-logo-icon">
-              <span className="material-symbols-outlined">waves</span>
+              <img src="/dayflow-icon-192.png" alt="DayFlow Logo" className="brand-logo-img" />
             </div>
             <span className="sidebar-brand-name">DayFlow</span>
           </div>
@@ -80,9 +91,10 @@ export const Navigation: React.FC = () => {
 
         {/* User Mini Profile in Sidebar */}
         <div className="sidebar-profile" onClick={() => setCurrentScreen('settings')}>
-          <img
-            src={user.avatarUrl}
-            alt={user.name}
+          <UserAvatar
+            avatarUrl={user.avatarUrl}
+            name={user.name}
+            size="md"
             className="sidebar-profile-avatar"
           />
           <div className="sidebar-profile-info">

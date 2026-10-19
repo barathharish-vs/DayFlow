@@ -4,6 +4,7 @@ import { api, tokenStorage } from '../services/api';
 
 interface AppContextType {
   isAuthenticated: boolean;
+  handleAuthSuccess: (token?: string) => Promise<void>;
   loginSession: (email: string, password: string) => Promise<void>;
   registerSession: (name: string, email: string, password: string) => Promise<void>;
   logoutSession: () => void;
@@ -29,6 +30,7 @@ interface AppContextType {
   showToast: (message: string) => void;
   toastMessage: string | null;
   refreshData: () => Promise<void>;
+  requestNotificationPermission: () => Promise<NotificationPermission>;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -37,6 +39,8 @@ const DEFAULT_PROFILE: UserProfile = {
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&h=160&q=80',
   dailyWaterGoal: 2500,
   notificationsEnabled: true,
+  waterRemindersEnabled: true,
+  taskRemindersEnabled: true,
   waterReminderFrequency: 60,
   theme: 'light',
 };
@@ -52,7 +56,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const hasToken = !!tokenStorage.get();
     if (!hasToken) return 'login';
     const saved = localStorage.getItem('dayflow_screen') as AppScreen;
-    const valid: AppScreen[] = ['dashboard', 'tasks', 'water', 'settings'];
+    const valid: AppScreen[] = ['dashboard', 'tasks', 'water', 'water-report', 'task-report', 'settings'];
     return valid.includes(saved) ? saved : 'dashboard';
   });
 
@@ -66,6 +70,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const requestNotificationPermission = useCallback(async (): Promise<NotificationPermission> => {
+    if (!('Notification' in window)) {
+      return 'denied';
+    }
+    const permission = await Notification.requestPermission();
+    return permission;
+  }, []);
+
   const showToast = useCallback((message: string) => {
     setToastMessage(message);
     setTimeout(() => {
@@ -74,7 +86,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     if (user.notificationsEnabled && 'Notification' in window) {
       if (Notification.permission === 'granted') {
-        new Notification('DayFlow', { body: message, icon: '/vite.svg' });
+        try {
+          new Notification('DayFlow', { body: message, icon: '/vite.svg' });
+        } catch {
+          // Ignore notification dispatch issues on some mobile/webview browsers
+        }
       }
     }
   }, [user.notificationsEnabled]);
@@ -111,17 +127,122 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('dayflow_screen', currentScreen);
   }, [currentScreen]);
 
-  // Hydration interval reminder timer (runs while app is active in browser)
+  // Central Theme Application & System Preference Synchronization
   useEffect(() => {
-    if (!isAuthenticated || !user.notificationsEnabled || !user.waterReminderFrequency) return;
+    const applyTheme = (resolvedTheme: 'light' | 'dark') => {
+      document.documentElement.setAttribute('data-theme', resolvedTheme);
+      document.documentElement.style.colorScheme = resolvedTheme;
+    };
+
+    const userTheme = user.theme || (localStorage.getItem('dayflow_theme') as UserProfile['theme']) || 'light';
+    localStorage.setItem('dayflow_theme', userTheme);
+
+    if (userTheme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mediaQuery.matches ? 'dark' : 'light');
+
+      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+        applyTheme(e.matches ? 'dark' : 'light');
+      };
+
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    } else {
+      applyTheme(userTheme);
+    }
+  }, [user.theme]);
+
+  // Hydration interval reminder timer (runs while DayFlow app is active in browser session)
+  useEffect(() => {
+    if (
+      !isAuthenticated ||
+      !user.notificationsEnabled ||
+      user.waterRemindersEnabled === false ||
+      !user.waterReminderFrequency
+    ) {
+      return;
+    }
 
     const intervalMs = Math.max(15, user.waterReminderFrequency) * 60 * 1000;
-    const timer = setInterval(() => {
-      showToast('Hydration check: Time for a refreshing glass of water! 💧');
-    }, intervalMs);
+    const safeUserKey = user.email ? encodeURIComponent(user.email.toLowerCase().trim()) : 'guest';
+    const lastWaterAlertKey = `dayflow_${safeUserKey}_last_water_reminder`;
 
+    const checkAndTriggerWaterReminder = () => {
+      const now = Date.now();
+      const lastAlert = parseInt(localStorage.getItem(lastWaterAlertKey) || '0', 10);
+
+      // Only alert if enough time has elapsed since the last alert, preventing duplicates on page refresh
+      if (now - lastAlert >= intervalMs) {
+        localStorage.setItem(lastWaterAlertKey, String(now));
+        showToast('Hydration check: Time for a refreshing glass of water! 💧');
+        setNotifications((prev) => [
+          `Hydration reminder (${user.waterReminderFrequency} min interval)`,
+          ...prev.slice(0, 19),
+        ]);
+      }
+    };
+
+    // If never alerted, seed initial timestamp to prevent immediate alert upon loading page
+    if (!localStorage.getItem(lastWaterAlertKey)) {
+      localStorage.setItem(lastWaterAlertKey, String(Date.now()));
+    }
+
+    const timer = setInterval(checkAndTriggerWaterReminder, 30000);
     return () => clearInterval(timer);
-  }, [isAuthenticated, user.notificationsEnabled, user.waterReminderFrequency, showToast]);
+  }, [isAuthenticated, user.notificationsEnabled, user.waterRemindersEnabled, user.waterReminderFrequency, user.email, showToast]);
+
+  // Task deadline reminder checker (runs every 30 seconds while browser session is active)
+  useEffect(() => {
+    if (
+      !isAuthenticated ||
+      !user.notificationsEnabled ||
+      user.taskRemindersEnabled === false
+    ) {
+      return;
+    }
+
+    const safeUserKey = user.email ? encodeURIComponent(user.email.toLowerCase().trim()) : 'guest';
+    const alertedTasksKey = `dayflow_${safeUserKey}_alerted_tasks`;
+
+    const checkTaskDeadlines = () => {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const currentHours = String(now.getHours()).padStart(2, '0');
+      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
+      let alertedScheduleKeys: string[] = [];
+      try {
+        alertedScheduleKeys = JSON.parse(localStorage.getItem(alertedTasksKey) || '[]');
+      } catch {
+        alertedScheduleKeys = [];
+      }
+
+      tasks.forEach((task) => {
+        // Must be pending, have reminder enabled, and be scheduled for today
+        if (!task.completed && task.reminder && task.dueDate === todayStr) {
+          if (task.dueTime) {
+            // Key incorporates task.id + dueDate + dueTime so editing schedule allows re-alerting
+            const scheduleKey = `${task.id}_${task.dueDate}_${task.dueTime}`;
+            if (!alertedScheduleKeys.includes(scheduleKey) && task.dueTime <= currentTimeStr) {
+              alertedScheduleKeys.push(scheduleKey);
+              showToast(`⏰ Task Due Now: "${task.title}" (${task.priority} priority)`);
+              setNotifications((prev) => [
+                `Task Due: "${task.title}" scheduled for ${task.dueTime}`,
+                ...prev.slice(0, 19),
+              ]);
+            }
+          }
+        }
+      });
+
+      localStorage.setItem(alertedTasksKey, JSON.stringify(alertedScheduleKeys.slice(-100)));
+    };
+
+    checkTaskDeadlines();
+    const deadlineTimer = setInterval(checkTaskDeadlines, 30000);
+    return () => clearInterval(deadlineTimer);
+  }, [isAuthenticated, user.notificationsEnabled, user.taskRemindersEnabled, user.email, tasks, showToast]);
 
   const loginSession = async (email: string, password: string) => {
     const res = await api.login({ email, password });
@@ -155,6 +276,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Logged out safely.');
   };
 
+  const handleAuthSuccess = async (token?: string) => {
+    if (token) {
+      tokenStorage.set(token);
+    }
+    setIsAuthenticated(true);
+    setCurrentScreen('dashboard');
+    await refreshData();
+  };
+
   const loginDemoSession = (userOverride?: Partial<UserProfile>) => {
     setIsAuthenticated(true);
     if (userOverride) {
@@ -170,6 +300,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateUser = async (updates: Partial<UserProfile>) => {
     try {
+      if (updates.name !== undefined || updates.avatarUrl !== undefined) {
+        await api.updateProfile({
+          name: updates.name,
+          avatarUrl: updates.avatarUrl,
+        });
+      }
       const updated = await api.updateSettings(updates);
       setUser(updated);
       showToast('Preferences updated successfully');
@@ -271,6 +407,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider
       value={{
         isAuthenticated,
+        handleAuthSuccess,
         loginSession,
         registerSession,
         logoutSession,
@@ -296,6 +433,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         showToast,
         toastMessage,
         refreshData,
+        requestNotificationPermission,
       }}
     >
       {children}

@@ -24,6 +24,8 @@ public class TaskDto {
 
     private Boolean completed = false;
 
+    private String completedAt;
+
     private Boolean reminder = false;
 
     private String createdAt;
@@ -92,6 +94,14 @@ public class TaskDto {
 
     public void setCompleted(Boolean completed) {
         this.completed = completed;
+    }
+
+    public String getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(String completedAt) {
+        this.completedAt = completedAt;
     }
 
     public Boolean getReminder() {

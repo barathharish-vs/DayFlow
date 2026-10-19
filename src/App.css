@@ -35,6 +35,34 @@
   background-color: #f8fafc;
 }
 
+/* Offline Status Banner */
+.offline-status-banner {
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.625rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  animation: slideToastIn 0.25s ease-out;
+}
+
+/* DayFlow Brand Logo Images */
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: inherit;
+  display: block;
+}
+
 /* Global Floating Toast */
 .global-toast-notification {
   position: fixed;

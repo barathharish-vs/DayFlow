@@ -75,4 +75,12 @@ public class TaskController {
         taskService.deleteTask(userDetails.getUsername(), id);
         return ResponseEntity.ok(Map.of("message", "Task deleted successfully"));
     }
+
+    @GetMapping("/weekly-report")
+    public ResponseEntity<com.dayflow.dto.WeeklyTaskReportDto> getWeeklyReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate
+    ) {
+        return ResponseEntity.ok(taskService.getWeeklyTaskReport(userDetails.getUsername(), targetDate));
+    }
 }

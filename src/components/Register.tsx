@@ -188,7 +188,7 @@ export const Register: React.FC<RegisterProps> = ({
       <main className="register-card">
         <header className="register-header">
           <div className="register-logo-badge" aria-hidden="true">
-            <span className="material-symbols-outlined">bolt</span>
+            <img src="/dayflow-icon-192.png" alt="DayFlow Logo" className="brand-logo-img" />
           </div>
 
           <h1 className="register-title">DayFlow</h1>

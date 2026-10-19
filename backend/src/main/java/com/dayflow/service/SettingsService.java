@@ -43,6 +43,12 @@ public class SettingsService {
         if (request.getNotificationsEnabled() != null) {
             settings.setNotificationsEnabled(request.getNotificationsEnabled());
         }
+        if (request.getWaterRemindersEnabled() != null) {
+            settings.setWaterRemindersEnabled(request.getWaterRemindersEnabled());
+        }
+        if (request.getTaskRemindersEnabled() != null) {
+            settings.setTaskRemindersEnabled(request.getTaskRemindersEnabled());
+        }
         if (request.getTheme() != null) {
             settings.setTheme(request.getTheme());
         }
@@ -66,9 +72,15 @@ public class SettingsService {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
-        dto.setAvatarUrl(user.getAvatarUrl());
+        if (user.getProfilePhotoData() != null && user.getProfilePhotoData().length > 0) {
+            dto.setAvatarUrl("/api/auth/profile-photo");
+        } else {
+            dto.setAvatarUrl(user.getAvatarUrl());
+        }
         dto.setDailyWaterGoal(settings.getDailyWaterGoal());
         dto.setNotificationsEnabled(settings.getNotificationsEnabled());
+        dto.setWaterRemindersEnabled(settings.getWaterRemindersEnabled());
+        dto.setTaskRemindersEnabled(settings.getTaskRemindersEnabled());
         dto.setWaterReminderFrequency(settings.getWaterReminderFrequency());
         dto.setTheme(settings.getTheme());
         dto.setTimezone(settings.getTimezone());

@@ -2,13 +2,16 @@ package com.dayflow.controller;
 
 import com.dayflow.dto.DailyWaterSummaryDto;
 import com.dayflow.dto.WaterLogDto;
+import com.dayflow.dto.WeeklyWaterReportDto;
 import com.dayflow.service.WaterLogService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -53,5 +56,13 @@ public class WaterLogController {
     @GetMapping("/summary")
     public ResponseEntity<DailyWaterSummaryDto> getSummary(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(waterLogService.getWaterSummary(userDetails.getUsername()));
+    }
+
+    @GetMapping("/weekly-report")
+    public ResponseEntity<WeeklyWaterReportDto> getWeeklyReport(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate
+    ) {
+        return ResponseEntity.ok(waterLogService.getWeeklyWaterReport(userDetails.getUsername(), targetDate));
     }
 }

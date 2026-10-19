@@ -18,8 +18,9 @@ export const tokenStorage = {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = tokenStorage.get();
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers || {}),
   };
 
@@ -27,10 +28,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    if (!navigator.onLine) {
+      throw new Error('You are currently offline. Please reconnect to sync with DayFlow.');
+    }
+    throw new Error('Unable to connect to DayFlow server. Please check your connection.');
+  }
 
   if (!response.ok) {
     let errorMessage = `Request failed with status ${response.status}`;
@@ -77,6 +86,32 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  uploadProfilePhoto: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return request<UserProfile>('/auth/profile-photo', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+
+  deleteProfilePhoto: () =>
+    request<UserProfile>('/auth/profile-photo', {
+      method: 'DELETE',
+    }),
+
+  getProfilePhotoBlobUrl: async (): Promise<string> => {
+    const token = tokenStorage.get();
+    const res = await fetch(`${API_BASE}/auth/profile-photo`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) {
+      throw new Error('Failed to load profile photo');
+    }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
+
   changeEmail: (data: { newEmail: string; password: string }) =>
     request<{ token: string; user: UserProfile }>('/auth/change-email', {
       method: 'POST',
@@ -93,6 +128,18 @@ export const api = {
     request<{ message: string }>('/auth/delete-account', {
       method: 'POST',
       body: JSON.stringify({ password }),
+    }),
+
+  forgotPassword: (email: string) =>
+    request<{ message: string; resetToken?: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (data: { token: string; newPassword: string }) =>
+    request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
     }),
 
   // Tasks
@@ -154,6 +201,16 @@ export const api = {
       progressPercentage: number;
       weeklyHistory: { day: string; amount: number; goal: number }[];
     }>('/water/summary'),
+
+  getWeeklyWaterReport: (targetDate?: string) => {
+    const qs = targetDate ? `?targetDate=${targetDate}` : '';
+    return request<any>(`/water/weekly-report${qs}`);
+  },
+
+  getWeeklyTaskReport: (targetDate?: string) => {
+    const qs = targetDate ? `?targetDate=${targetDate}` : '';
+    return request<any>(`/tasks/weekly-report${qs}`);
+  },
 
   // Settings
   getSettings: () => request<UserProfile>('/settings'),

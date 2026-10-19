@@ -141,7 +141,7 @@ export const Login: React.FC<LoginProps> = ({
       <main className="login-card">
         <header className="login-header">
           <div className="login-logo-badge" aria-hidden="true">
-            <span className="material-symbols-outlined">bolt</span>
+            <img src="/dayflow-icon-192.png" alt="DayFlow Logo" className="brand-logo-img" />
           </div>
           <h1 className="login-title">DayFlow</h1>
           <p className="login-subtitle">

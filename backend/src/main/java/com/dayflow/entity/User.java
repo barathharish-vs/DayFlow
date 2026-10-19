@@ -23,6 +23,13 @@ public class User {
     @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
 
+    @Lob
+    @Column(name = "profile_photo_data", columnDefinition = "MEDIUMBLOB")
+    private byte[] profilePhotoData;
+
+    @Column(name = "profile_photo_content_type", length = 50)
+    private String profilePhotoContentType;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -90,6 +97,22 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public byte[] getProfilePhotoData() {
+        return profilePhotoData;
+    }
+
+    public void setProfilePhotoData(byte[] profilePhotoData) {
+        this.profilePhotoData = profilePhotoData;
+    }
+
+    public String getProfilePhotoContentType() {
+        return profilePhotoContentType;
+    }
+
+    public void setProfilePhotoContentType(String profilePhotoContentType) {
+        this.profilePhotoContentType = profilePhotoContentType;
     }
 
     public LocalDateTime getCreatedAt() {

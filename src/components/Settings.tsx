@@ -1,25 +1,136 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { api } from '../services/api';
 import type { UserProfile } from '../types';
+import UserAvatar from './UserAvatar';
+import InstallPwaCard from './InstallPwaCard';
 import './Settings.css';
 
 export const Settings: React.FC = () => {
-  const { user, updateUser, logoutDemoSession, showToast } = useApp();
+  const { user, updateUser, logoutDemoSession, showToast, requestNotificationPermission, refreshData } = useApp();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [dailyWaterGoal, setDailyWaterGoal] = useState(user.dailyWaterGoal);
   const [notificationsEnabled, setNotificationsEnabled] = useState(user.notificationsEnabled);
+  const [waterRemindersEnabled, setWaterRemindersEnabled] = useState(user.waterRemindersEnabled ?? true);
+  const [taskRemindersEnabled, setTaskRemindersEnabled] = useState(user.taskRemindersEnabled ?? true);
   const [waterReminderFrequency, setWaterReminderFrequency] = useState(user.waterReminderFrequency);
   const [theme, setTheme] = useState(user.theme);
+  const [browserPermission, setBrowserPermission] = useState<string>(() => {
+    return 'Notification' in window ? Notification.permission : 'unsupported';
+  });
+
+  React.useEffect(() => {
+    setName(user.name);
+    setEmail(user.email);
+    setDailyWaterGoal(user.dailyWaterGoal);
+    setNotificationsEnabled(user.notificationsEnabled);
+    setWaterRemindersEnabled(user.waterRemindersEnabled ?? true);
+    setTaskRemindersEnabled(user.taskRemindersEnabled ?? true);
+    setWaterReminderFrequency(user.waterReminderFrequency);
+    setTheme(user.theme);
+  }, [user]);
+
+  const handleRequestPermission = async () => {
+    if (!('Notification' in window)) {
+      showToast('Browser notifications are not supported on this device.');
+      return;
+    }
+    const perm = await requestNotificationPermission();
+    setBrowserPermission(perm);
+    if (perm === 'granted') {
+      showToast('Browser notification permission granted! 🔔');
+    } else if (perm === 'denied') {
+      showToast('Notifications blocked in browser. Change permission in browser site settings.');
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError('Image file is too large. Maximum size is 5MB.');
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      setPhotoError('Only JPEG, PNG, and WebP image formats are supported.');
+      e.target.value = '';
+      return;
+    }
+
+    setPhotoError(null);
+    setSelectedPhotoFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPhotoPreviewUrl(objectUrl);
+  };
+
+  const handleCancelPreview = () => {
+    if (photoPreviewUrl) {
+      URL.revokeObjectURL(photoPreviewUrl);
+    }
+    setPhotoPreviewUrl(null);
+    setSelectedPhotoFile(null);
+    setPhotoError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSavePhoto = async () => {
+    if (!selectedPhotoFile) return;
+    setIsUploadingPhoto(true);
+    setPhotoError(null);
+
+    try {
+      await api.uploadProfilePhoto(selectedPhotoFile);
+      showToast('Profile photo saved successfully! 📸');
+      handleCancelPreview();
+      await refreshData();
+    } catch (err: unknown) {
+      setPhotoError(err instanceof Error ? err.message : 'Failed to upload photo');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!window.confirm('Are you sure you want to remove your profile photo?')) return;
+    setIsUploadingPhoto(true);
+    setPhotoError(null);
+
+    try {
+      await api.deleteProfilePhoto();
+      showToast('Profile photo removed.');
+      handleCancelPreview();
+      await refreshData();
+    } catch (err: unknown) {
+      setPhotoError(err instanceof Error ? err.message : 'Failed to remove photo');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     updateUser({
       name,
-      email,
       dailyWaterGoal,
       notificationsEnabled,
+      waterRemindersEnabled,
+      taskRemindersEnabled,
       waterReminderFrequency,
       theme,
     });
@@ -66,21 +177,122 @@ export const Settings: React.FC = () => {
           </div>
 
           <div className="profile-row-editor">
-            <img src={user.avatarUrl} alt={user.name} className="profile-large-avatar" />
+            <div className="avatar-preview-container">
+              {photoPreviewUrl ? (
+                <img
+                  src={photoPreviewUrl}
+                  alt="Photo Preview"
+                  className="profile-large-avatar"
+                />
+              ) : (
+                <UserAvatar
+                  avatarUrl={user.avatarUrl}
+                  name={user.name}
+                  size="lg"
+                  className="profile-large-avatar"
+                />
+              )}
+            </div>
+
             <div className="avatar-edit-info">
-              <span className="avatar-hint">Avatar photo linked to your account</span>
-              <button
-                type="button"
-                className="change-avatar-btn"
-                onClick={() => {
-                  const newUrl = prompt('Enter a new image URL for your avatar:', user.avatarUrl);
-                  if (newUrl) {
-                    updateUser({ avatarUrl: newUrl });
-                  }
-                }}
-              >
-                Change Avatar
-              </button>
+              <span className="avatar-hint">
+                JPG, PNG, or WebP (max 5MB). Photo is securely stored with your account.
+              </span>
+
+              {photoError && (
+                <div style={{ color: '#ef4444', fontSize: '0.8125rem', fontWeight: 600 }}>
+                  ⚠️ {photoError}
+                </div>
+              )}
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                {photoPreviewUrl ? (
+                  <>
+                    <button
+                      type="button"
+                      className="save-photo-btn"
+                      style={{
+                        background: '#2563eb',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '0.4rem 0.9rem',
+                        borderRadius: '8px',
+                        fontSize: '0.8125rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                      disabled={isUploadingPhoto}
+                      onClick={handleSavePhoto}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                        {isUploadingPhoto ? 'hourglass_top' : 'save'}
+                      </span>
+                      <span>{isUploadingPhoto ? 'Saving...' : 'Save New Photo'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cancel-btn"
+                      style={{
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '8px',
+                        fontSize: '0.8125rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                      disabled={isUploadingPhoto}
+                      onClick={handleCancelPreview}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="change-avatar-btn"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>
+                        photo_camera
+                      </span>
+                      <span>Choose Photo</span>
+                    </button>
+
+                    {user.avatarUrl && (
+                      <button
+                        type="button"
+                        className="danger-btn"
+                        style={{
+                          padding: '0.375rem 0.8rem',
+                          borderRadius: '8px',
+                          fontSize: '0.8125rem',
+                          cursor: 'pointer',
+                        }}
+                        disabled={isUploadingPhoto}
+                        onClick={handleRemovePhoto}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                          delete
+                        </span>
+                        <span>Remove</span>
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -97,13 +309,13 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="settings-field">
-              <label className="field-label">Email Address</label>
+              <label className="field-label">Email Address (Read-only)</label>
               <input
                 type="email"
                 className="field-input"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                disabled
+                title="Account email address"
               />
             </div>
           </div>
@@ -165,10 +377,11 @@ export const Settings: React.FC = () => {
             </div>
           </div>
 
+          {/* Master Notifications Switch */}
           <div className="toggle-setting-row">
             <div>
-              <span className="toggle-title">Push Notifications</span>
-              <p className="toggle-desc">Receive real-time desktop reminders for pending tasks and hydration.</p>
+              <span className="toggle-title">Master Notifications</span>
+              <p className="toggle-desc">Enable or disable all in-app and browser notifications across DayFlow.</p>
             </div>
             <label className="switch-toggle">
               <input
@@ -178,6 +391,86 @@ export const Settings: React.FC = () => {
               />
               <span className="slider-round" />
             </label>
+          </div>
+
+          {/* Water Reminders Switch */}
+          <div className="toggle-setting-row" style={{ opacity: notificationsEnabled ? 1 : 0.6 }}>
+            <div>
+              <span className="toggle-title">Hydration Reminders 💧</span>
+              <p className="toggle-desc">Receive periodic drink reminders during active browser sessions.</p>
+            </div>
+            <label className="switch-toggle">
+              <input
+                type="checkbox"
+                checked={waterRemindersEnabled}
+                disabled={!notificationsEnabled}
+                onChange={(e) => setWaterRemindersEnabled(e.target.checked)}
+              />
+              <span className="slider-round" />
+            </label>
+          </div>
+
+          {/* Task Reminders Switch */}
+          <div className="toggle-setting-row" style={{ opacity: notificationsEnabled ? 1 : 0.6 }}>
+            <div>
+              <span className="toggle-title">Task Schedule Reminders ⏰</span>
+              <p className="toggle-desc">Receive alerts when scheduled tasks reach their due time.</p>
+            </div>
+            <label className="switch-toggle">
+              <input
+                type="checkbox"
+                checked={taskRemindersEnabled}
+                disabled={!notificationsEnabled}
+                onChange={(e) => setTaskRemindersEnabled(e.target.checked)}
+              />
+              <span className="slider-round" />
+            </label>
+          </div>
+
+          {/* Browser Desktop Permission Status & Action */}
+          <div style={{ marginTop: '1.25rem', padding: '1rem', background: 'var(--bg-card-secondary, #f8fafc)', borderRadius: '10px', border: '1px solid var(--border-color, #e2e8f0)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  Desktop Notification Permission:
+                </span>
+                <span
+                  style={{
+                    marginLeft: '0.5rem',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    background: browserPermission === 'granted' ? '#dcfce7' : browserPermission === 'denied' ? '#fee2e2' : '#f1f5f9',
+                    color: browserPermission === 'granted' ? '#15803d' : browserPermission === 'denied' ? '#b91c1c' : '#475569',
+                  }}
+                >
+                  {browserPermission.toUpperCase()}
+                </span>
+              </div>
+
+              {browserPermission !== 'granted' && browserPermission !== 'unsupported' && (
+                <button
+                  type="button"
+                  className="action-outline-btn"
+                  style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem' }}
+                  onClick={handleRequestPermission}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>notifications_active</span>
+                  <span>Enable Desktop Alerts</span>
+                </button>
+              )}
+            </div>
+
+            {browserPermission === 'denied' && (
+              <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#b91c1c' }}>
+                ⚠️ Desktop notifications are currently blocked by your browser. To unblock: click the lock / settings icon next to the URL in your browser's address bar and set Notifications to <strong>Allow</strong>.
+              </p>
+            )}
+
+            <p style={{ marginTop: '0.5rem', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              Note: Reminders trigger while DayFlow is open in an active browser tab or window.
+            </p>
           </div>
 
           <div className="settings-form-grid" style={{ marginTop: '1rem' }}>
@@ -204,6 +497,9 @@ export const Settings: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* PWA Installation & Offline Info */}
+      <InstallPwaCard />
 
       {/* Account Danger / Data Management Zone */}
       <section className="settings-section-card danger-zone-card">
