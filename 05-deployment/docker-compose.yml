@@ -21,7 +21,7 @@ services:
 
   backend:
     build:
-      context: ../backend
+      context: ../02-backend
       dockerfile: Dockerfile
     container_name: dayflow-backend
     restart: unless-stopped
@@ -41,8 +41,8 @@ services:
 
   frontend:
     build:
-      context: ../frontend
-      dockerfile: ../deployment/Dockerfile.frontend
+      context: ../01-frontend
+      dockerfile: ../05-deployment/Dockerfile.frontend
     container_name: dayflow-frontend
     restart: unless-stopped
     depends_on:

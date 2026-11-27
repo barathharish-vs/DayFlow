@@ -6,9 +6,9 @@ This directory contains containerization and deployment configurations for the D
 
 Ensure Docker and Docker Compose are installed and running.
 
-1. Navigate to the `deployment/` directory:
+1. Navigate to the `05-deployment/` directory:
    ```bash
-   cd deployment
+   cd 05-deployment
    ```
 2. Start all services (MySQL 8, Spring Boot Backend, and Nginx Frontend):
    ```bash
