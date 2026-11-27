@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DayFlow - Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-fixed": "#e0e3e5",
+            "on-secondary-container": "#00714d",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "background": "#faf8ff",
+            "primary": "#004ac6",
+            "surface": "#faf8ff",
+            "primary-fixed": "#dbe1ff",
+            "on-primary-fixed-variant": "#003ea8",
+            "error-container": "#ffdad6",
+            "secondary": "#006c49",
+            "surface-bright": "#faf8ff",
+            "tertiary": "#525657",
+            "error": "#ba1a1a",
+            "primary-fixed-dim": "#b4c5ff",
+            "on-surface-variant": "#434655",
+            "inverse-on-surface": "#eef0ff",
+            "surface-container-low": "#f2f3ff",
+            "outline-variant": "#c3c6d7",
+            "on-tertiary-fixed-variant": "#444749",
+            "on-secondary-fixed": "#002113",
+            "secondary-container": "#6cf8bb",
+            "inverse-primary": "#b4c5ff",
+            "surface-container-highest": "#dae2fd",
+            "inverse-surface": "#283044",
+            "on-background": "#131b2e",
+            "surface-variant": "#dae2fd",
+            "on-primary-fixed": "#00174b",
+            "on-secondary-fixed-variant": "#005236",
+            "surface-tint": "#0053db",
+            "on-primary-container": "#eeefff",
+            "secondary-fixed-dim": "#4edea3",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "surface-container": "#eaedff",
+            "on-tertiary-container": "#eff1f3",
+            "tertiary-container": "#6b6e70",
+            "outline": "#737686",
+            "on-error": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e2e7ff",
+            "tertiary-fixed-dim": "#c4c7c9",
+            "on-surface": "#131b2e",
+            "primary-container": "#2563eb",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed": "#191c1e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1.25rem",
+            "space-xl": "3.5rem",
+            "space-xs": "0.375rem",
+            "gutter": "1.5rem",
+            "margin": "2rem",
+            "space-lg": "2rem",
+            "space-sm": "0.75rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9fc;
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+<main class="w-full max-w-md mx-auto">
+<!-- Brand Header -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-container text-on-primary mb-3 shadow-md">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h1 class="font-headline-lg text-on-background tracking-tight">DayFlow</h1>
+<p class="font-body-md text-on-surface-variant mt-1">Get started with DayFlow</p>
+</div>
+<!-- Registration Card -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] border border-[rgba(15,23,42,0.08)]">
+<form class="space-y-5" onsubmit="event.preventDefault();">
+<!-- Full Name -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5">Full Name</label>
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-outline material-symbols-outlined text-lg">person</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-on-background focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Alex Morgan" type="text"/>
+</div>
+</div>
+<!-- Email Address -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5">Email Address</label>
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-outline material-symbols-outlined text-lg">mail</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-on-background focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="alex@example.com" type="email"/>
+</div>
+</div>
+<!-- Password -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5">Password</label>
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-outline material-symbols-outlined text-lg">lock</span>
+<input class="w-full pl-10 pr-10 py-2.5 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-on-background focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="password" placeholder="Create a secure password" type="password"/>
+<button class="absolute right-3.5 text-outline hover:text-on-surface transition-colors" onclick="togglePassword('password', 'eye-icon-1')" type="button">
+<span class="material-symbols-outlined text-lg" id="eye-icon-1">visibility</span>
+</button>
+</div>
+</div>
+<!-- Confirm Password -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5">Confirm Password</label>
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-outline material-symbols-outlined text-lg">lock_reset</span>
+<input class="w-full pl-10 pr-10 py-2.5 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-on-background focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="confirm-password" placeholder="Confirm your password" type="password"/>
+<button class="absolute right-3.5 text-outline hover:text-on-surface transition-colors" onclick="togglePassword('confirm-password', 'eye-icon-2')" type="button">
+<span class="material-symbols-outlined text-lg" id="eye-icon-2">visibility</span>
+</button>
+</div>
+</div>
+<!-- Password Strength / Requirements Checklist -->
+<div class="bg-surface-container-low p-3.5 rounded-lg border border-outline-variant/50 space-y-2">
+<p class="font-label-sm text-on-surface-variant font-medium">Password requirements:</p>
+<ul class="space-y-1.5 font-label-sm text-outline">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>At least 8 characters long</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+<span>Contains a number or symbol</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+<span>At least one uppercase letter</span>
+</li>
+</ul>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-3 px-4 bg-[#2564eb] hover:bg-primary-container/90 text-on-primary font-label-md font-semibold rounded-lg shadow-sm transition-all duration-200 active:scale-[0.98]" type="submit">
+          Create Account
+        </button>
+</form>
+<!-- Footer Sign In Link -->
+<div class="mt-6 text-center">
+<p class="font-body-sm text-on-surface-variant">
+          Already have an account? 
+          <a class="text-primary font-medium hover:underline ml-1" href="#">Sign In</a>
+</p>
+</div>
+</div>
+</main>
+<script>
+    function togglePassword(fieldId, iconId) {
+      const field = document.getElementById(fieldId);
+      const icon = document.getElementById(iconId);
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        field.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+  </script>
+</body></html>

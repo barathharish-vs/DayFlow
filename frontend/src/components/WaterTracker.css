@@ -1,0 +1,528 @@
+.water-tracker-container {
+  padding: 2rem 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Header */
+.water-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.water-title {
+  font-family: var(--font-headline);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.water-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.secondary-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Hero Progress Card */
+.water-hero-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 30px -4px rgba(15, 23, 42, 0.06);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.gauge-wrapper {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gauge-center-content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-icon {
+  font-size: 28px;
+  color: #0284c7;
+  margin-bottom: 2px;
+}
+
+.gauge-amount {
+  font-family: var(--font-headline);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.gauge-unit {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.gauge-percent-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: #e0f2fe;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  margin-top: 6px;
+}
+
+/* Right Side of Hero Card */
+.gauge-meta-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.summary-pill-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.summary-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pill-label {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.pill-val {
+  font-family: var(--font-headline);
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pill-goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-goal-link {
+  background: none;
+  border: none;
+  color: #0284c7;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-goal-link:hover {
+  text-decoration: underline;
+}
+
+.edit-goal-inline-form {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-hint-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #166534;
+}
+
+.inline-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.goal-input {
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  width: 140px;
+}
+
+.save-goal-btn {
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  padding: 0.4375rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+/* Quick presets */
+.quick-presets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.presets-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.preset-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 0.5rem;
+  background: #f0fdfa;
+  border: 1.5px solid #99f6e4;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #0f766e;
+}
+
+.preset-btn:hover {
+  background: #ccfbf1;
+  transform: translateY(-2px);
+}
+
+.preset-btn.highlight {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+}
+
+.preset-btn.highlight:hover {
+  background: #bae6fd;
+}
+
+.preset-amount {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.preset-caption {
+  font-size: 0.6875rem;
+}
+
+.custom-water-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.custom-amt-input {
+  flex: 1;
+  padding: 0.5625rem 0.875rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.custom-amt-input:focus {
+  border-color: #0284c7;
+}
+
+.custom-amt-submit {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 0.5625rem 1.125rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.custom-amt-submit:hover {
+  background: #0369a1;
+}
+
+/* Two Column Details Grid */
+.water-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.water-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card-top-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.badge-count {
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+/* Intake Timeline List */
+.history-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+}
+
+.history-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.history-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-icon-circle .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.history-item-amount {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+.history-item-type {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-left: 0.375rem;
+}
+
+.history-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.history-item-time {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.delete-log-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.delete-log-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.empty-history-box {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-history-box .material-symbols-outlined {
+  font-size: 40px;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+}
+
+/* Weekly Bars */
+.weekly-graph-intro {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.weekly-bars-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 180px;
+  padding-top: 1.5rem;
+}
+
+.day-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.day-val {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.day-bar-bg {
+  width: 22px;
+  height: 120px;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.day-bar-fill {
+  width: 100%;
+  background: #38bdf8;
+  border-radius: 9999px;
+  transition: height 0.4s ease;
+}
+
+.day-bar-fill.achieved {
+  background: #0284c7;
+}
+
+.day-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+  .water-hero-card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .water-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .water-tracker-container {
+    padding: 1.25rem 1rem 5rem 1rem;
+  }
+  .preset-buttons-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

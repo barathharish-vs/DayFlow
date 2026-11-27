@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DayFlow - Tasks</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration from Style Guidance -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed": "#191c1e",
+            "on-secondary-fixed": "#002113",
+            "surface-variant": "#dae2fd",
+            "on-surface-variant": "#434655",
+            "secondary": "#006c49",
+            "surface-container-high": "#e2e7ff",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#005236",
+            "tertiary-fixed": "#e0e3e5",
+            "surface-bright": "#faf8ff",
+            "inverse-primary": "#b4c5ff",
+            "on-tertiary-container": "#eff1f3",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#4edea3",
+            "background": "#faf8ff",
+            "surface-tint": "#0053db",
+            "secondary-container": "#6cf8bb",
+            "error": "#ba1a1a",
+            "tertiary": "#525657",
+            "tertiary-container": "#6b6e70",
+            "inverse-on-surface": "#eef0ff",
+            "inverse-surface": "#283044",
+            "on-secondary-container": "#00714d",
+            "on-primary-container": "#eeefff",
+            "outline-variant": "#c3c6d7",
+            "on-tertiary-fixed-variant": "#444749",
+            "on-primary": "#ffffff",
+            "on-background": "#131b2e",
+            "primary-container": "#2563eb",
+            "surface-container-highest": "#dae2fd",
+            "primary": "#004ac6",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary-fixed": "#6ffbbe",
+            "on-primary-fixed": "#00174b",
+            "on-tertiary": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "tertiary-fixed-dim": "#c4c7c9",
+            "on-primary-fixed-variant": "#003ea8",
+            "on-error-container": "#93000a",
+            "on-surface": "#131b2e",
+            "primary-fixed": "#dbe1ff",
+            "outline": "#737686",
+            "surface-container": "#eaedff",
+            "surface": "#faf8ff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "space-sm": "0.75rem",
+            "space-xs": "0.375rem",
+            "space-md": "1.25rem",
+            "space-xl": "3.5rem",
+            "space-lg": "2rem",
+            "margin": "2rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+<!-- SideNavBar (Desktop Shell) -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col justify-between p-4 z-40 bg-surface-container-low dark:bg-inverse-surface shadow-sm hidden md:flex">
+<div>
+<div class="flex items-center gap-3 px-3 py-4 mb-4">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container font-headline-md font-extrabold shadow-sm">
+          DF
+        </div>
+<div>
+<h2 class="text-headline-sm font-headline-sm font-extrabold text-primary dark:text-inverse-primary">Productivity Hub</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant dark:text-surface-variant">Welcome back</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-primary font-bold bg-surface-container dark:bg-surface scale-98 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">water_drop</span>
+<span class="font-label-md text-label-md">Water</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</div>
+<div class="p-3 bg-surface-container rounded-xl flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold text-sm">
+        JS
+      </div>
+<div class="overflow-hidden">
+<p class="text-body-sm font-medium truncate">Julian Smith</p>
+<p class="text-label-sm text-on-surface-variant truncate">julian@dayflow.co</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 bg-surface dark:bg-inverse-surface w-full px-4 md:px-8 py-4 flex justify-between items-center max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 rounded-lg hover:bg-surface-variant text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-md font-headline-md font-extrabold text-primary dark:text-inverse-primary">Tasks</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative hidden sm:block">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-sm">search</span>
+</span>
+<input class="pl-9 pr-4 py-1.5 text-body-sm rounded-lg bg-surface-container border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary w-64" placeholder="Search tasks..." type="text"/>
+</div>
+<button class="relative p-2 rounded-lg hover:bg-surface-variant text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left 2 Columns: Filters & Task List -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Filter Tabs -->
+<div class="flex flex-wrap items-center gap-2 border-b border-outline-variant/40 pb-4">
+<button class="px-4 py-2 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md shadow-sm transition-all">
+            Today <span class="ml-1 px-1.5 py-0.2 bg-white/20 rounded-full text-xs">4</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant text-label-md font-label-md transition-all">
+            Upcoming <span class="ml-1 px-1.5 py-0.2 bg-outline-variant/30 rounded-full text-xs">12</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant text-label-md font-label-md transition-all">
+            Overdue <span class="ml-1 px-1.5 py-0.2 bg-error-container text-on-error-container rounded-full text-xs">2</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant text-label-md font-label-md transition-all">
+            Completed <span class="ml-1 px-1.5 py-0.2 bg-outline-variant/30 rounded-full text-xs">28</span>
+</button>
+</div>
+<!-- Task List Items -->
+<div class="space-y-3">
+<!-- Overdue Task Card -->
+<div class="p-4 rounded-xl bg-surface-container-lowest border border-error/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex items-start gap-4 transition-all hover:shadow-md">
+<input class="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-body-lg font-medium text-on-background">Q3 Financial Projection Review</h3>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-error-container text-on-error-container font-bold">Overdue</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-3">Analyze variance reports across departmental budgets and prepare executive summary deck.</p>
+<div class="flex flex-wrap items-center gap-3 text-label-sm text-outline">
+<span class="flex items-center gap-1 text-error">
+<span class="material-symbols-outlined text-sm">schedule</span> Yesterday, 5:00 PM
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">folder</span> Finance
+                </span>
+<span class="px-2 py-0.5 rounded bg-error-container/40 text-error font-medium text-[10px]">High Priority</span>
+</div>
+</div>
+</div>
+<!-- Normal / Today Task Card -->
+<div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex items-start gap-4 transition-all hover:shadow-md">
+<input class="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-body-lg font-medium text-on-background">Design System Token Sync</h3>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant">Today</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-3">Verify updated color tokens and spacing variables with frontend architecture team.</p>
+<div class="flex flex-wrap items-center gap-3 text-label-sm text-outline">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> Today, 2:30 PM
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">folder</span> Design
+                </span>
+<span class="px-2 py-0.5 rounded bg-secondary-container/40 text-on-secondary-container font-medium text-[10px]">Medium</span>
+</div>
+</div>
+</div>
+<!-- Another Today Task Card -->
+<div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex items-start gap-4 transition-all hover:shadow-md">
+<input class="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-body-lg font-medium text-on-background">Weekly 1:1 with Engineering Lead</h3>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant">Today</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-3">Review sprint velocity, unblock API dependencies, and discuss tech debt allocation.</p>
+<div class="flex flex-wrap items-center gap-3 text-label-sm text-outline">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> Today, 4:00 PM
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">folder</span> Management
+                </span>
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-medium text-[10px]">Low</span>
+</div>
+</div>
+</div>
+<!-- Completed Task Card (Visually Distinguished) -->
+<div class="p-4 rounded-xl bg-surface-container-low/50 border border-outline-variant/10 opacity-70 flex items-start gap-4 transition-all">
+<input checked="" class="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary cursor-pointer accent-secondary" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-body-lg font-medium text-on-surface-variant line-through">Morning Mindfulness &amp; Stretch</h3>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-container text-on-secondary-container font-bold">Completed</span>
+</div>
+<p class="text-body-sm text-on-surface-variant/70 mb-3">Completed 15-minute guided breathwork and mobility exercises.</p>
+<div class="flex flex-wrap items-center gap-3 text-label-sm text-outline">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> Today, 8:00 AM
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">folder</span> Wellness
+                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Add-Task Form Card -->
+<div class="space-y-6">
+<div class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/20 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)]">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-headline-sm font-headline-sm font-extrabold text-primary">Create New Task</h2>
+<span class="material-symbols-outlined text-outline">add_task</span>
+</div>
+<form class="space-y-4">
+<!-- Title -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Task Title</label>
+<input class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Update Landing Page Copy" type="text"/>
+</div>
+<!-- Description -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Description</label>
+<textarea class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary resize-none" placeholder="Add relevant details, context, or links..." rows="3"></textarea>
+</div>
+<!-- Date & Time Grid -->
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Date</label>
+<input class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary" type="date"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Time</label>
+<input class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary" type="time"/>
+</div>
+</div>
+<!-- Priority Selector -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Priority</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2 text-center text-label-md font-label-md rounded-lg border border-outline-variant hover:bg-surface-container transition-all" type="button">Low</button>
+<button class="py-2 text-center text-label-md font-label-md rounded-lg bg-primary-container text-on-primary-container font-bold transition-all shadow-sm" type="button">Medium</button>
+<button class="py-2 text-center text-label-md font-label-md rounded-lg border border-outline-variant hover:bg-surface-container transition-all" type="button">High</button>
+</div>
+</div>
+<!-- Category -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Category</label>
+<select class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary">
+<option>Work &amp; Projects</option>
+<option>Personal &amp; Life</option>
+<option>Wellness &amp; Health</option>
+<option>Finance</option>
+</select>
+</div>
+<!-- Reminder Settings -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1">Reminder</label>
+<select class="w-full px-3 py-2 text-body-sm rounded-lg bg-surface-container/50 border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary">
+<option>10 minutes before</option>
+<option>30 minutes before</option>
+<option>1 hour before</option>
+<option>Custom time</option>
+</select>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-3 bg-primary-container text-on-primary-container rounded-lg font-label-md font-bold shadow-sm hover:opacity-95 transition-all" type="submit">
+              Save Task
+            </button>
+</form>
+</div>
+</div>
+</main>
+</div>
+</body></html>

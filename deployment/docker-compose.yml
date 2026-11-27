@@ -1,0 +1,60 @@
+services:
+  database:
+    image: mysql:8.0
+    container_name: dayflow-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: dayflow_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ../database/seeds/seed.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dayflow-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: dayflow-backend
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/dayflow_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      JWT_SECRET: ${JWT_SECRET:-DayFlowSecretKeyForJwtAuthenticationMustBeAtLeast256BitsLong2026!}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - dayflow-network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../deployment/Dockerfile.frontend
+    container_name: dayflow-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - dayflow-network
+
+volumes:
+  db_data:
+
+networks:
+  dayflow-network:
+    driver: bridge

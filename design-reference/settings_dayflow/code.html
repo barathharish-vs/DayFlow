@@ -1,0 +1,299 @@
+<html><head><meta charset="utf-8"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-tertiary-fixed": "#191c1e",
+          "on-secondary-fixed": "#002113",
+          "surface-variant": "#dae2fd",
+          "on-surface-variant": "#434655",
+          "secondary": "#006c49",
+          "surface-container-high": "#e2e7ff",
+          "error-container": "#ffdad6",
+          "on-secondary-fixed-variant": "#005236",
+          "tertiary-fixed": "#e0e3e5",
+          "surface-bright": "#faf8ff",
+          "inverse-primary": "#b4c5ff",
+          "on-tertiary-container": "#eff1f3",
+          "on-secondary": "#ffffff",
+          "secondary-fixed-dim": "#4edea3",
+          "background": "#faf8ff",
+          "surface-tint": "#0053db",
+          "secondary-container": "#6cf8bb",
+          "error": "#ba1a1a",
+          "tertiary": "#525657",
+          "tertiary-container": "#6b6e70",
+          "inverse-on-surface": "#eef0ff",
+          "inverse-surface": "#283044",
+          "on-secondary-container": "#00714d",
+          "on-primary-container": "#eeefff",
+          "outline-variant": "#c3c6d7",
+          "on-tertiary-fixed-variant": "#444749",
+          "on-primary": "#ffffff",
+          "on-background": "#131b2e",
+          "primary-container": "#2563eb",
+          "surface-container-highest": "#dae2fd",
+          "primary": "#004ac6",
+          "primary-fixed-dim": "#b4c5ff",
+          "secondary-fixed": "#6ffbbe",
+          "on-primary-fixed": "#00174b",
+          "on-tertiary": "#ffffff",
+          "surface-dim": "#d2d9f4",
+          "tertiary-fixed-dim": "#c4c7c9",
+          "on-primary-fixed-variant": "#003ea8",
+          "on-error-container": "#93000a",
+          "on-surface": "#131b2e",
+          "primary-fixed": "#dbe1ff",
+          "outline": "#737686",
+          "surface-container": "#eaedff",
+          "surface": "#faf8ff",
+          "surface-container-low": "#f2f3ff",
+          "surface-container-lowest": "#ffffff",
+          "on-error": "#ffffff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "gutter": "1.5rem",
+          "space-sm": "0.75rem",
+          "space-xs": "0.375rem",
+          "space-md": "1.25rem",
+          "space-xl": "3.5rem",
+          "space-lg": "2rem",
+          "margin": "2rem"
+        },
+        "fontFamily": {
+          "label-sm": ["Inter"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "headline-xl": ["Plus Jakarta Sans"],
+          "body-sm": ["Inter"],
+          "body-lg": ["Inter"],
+          "headline-sm": ["Plus Jakarta Sans"],
+          "label-md": ["Inter"],
+          "headline-lg": ["Plus Jakarta Sans"],
+          "body-md": ["Inter"]
+        },
+        "fontSize": {
+          "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+          "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+          "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+          "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+          "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+          "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+          "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+        }
+      },
+    },
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head><body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col justify-between p-4 z-40 bg-surface-container-low dark:bg-inverse-surface shadow-sm">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3 px-3 py-2">
+<div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-headline-sm">
+          DF
+        </div>
+<div>
+<h1 class="text-headline-md font-headline-md font-extrabold text-primary dark:text-inverse-primary">Productivity Hub</h1>
+<p class="text-label-sm text-on-surface-variant dark:text-surface-variant">Welcome back</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="text-label-md font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">water_drop</span>
+<span class="text-label-md font-label-md">Water</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-primary font-bold bg-surface-container dark:bg-surface scale-98 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</nav>
+</div>
+<div class="p-3 bg-surface-container-high rounded-xl flex items-center gap-3">
+<img class="w-9 h-9 rounded-full object-cover" data-alt="A professional portrait photo of a smiling person with clean lighting, set against a soft neutral background representing a modern SaaS user profile in a calm light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDowKqDfiVyplgh2QLyJDSJ_Eyf3RkWGJYq0nHWOMZUHAq3wpsjM_KM-Zw0l2v3tkHbhCcvARZ8E1UG8JPudGx7rZRV78m9uB0QAfzp2DegcgaYINJ2Awu7ea20uSuxXfOipi3Kn9VjItiHttT8tS2L0UbQQ7Nqu7mJMAGd0Uv__QQAAqT5aYKAI8EDPnrwBjdE8ICUk_0rmIdl74LFnE8NrpvhBNy7efMG2GgP1nPUxgzpC1x6YRq-gw"/>
+<div class="overflow-hidden">
+<p class="text-body-sm font-semibold truncate text-on-surface">Alex Morgan</p>
+<p class="text-label-sm text-on-surface-variant truncate">alex@dayflow.app</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen bg-background">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface w-full px-8 py-4 flex justify-between items-center z-30">
+<div class="flex items-center gap-4">
+<h2 class="text-headline-md font-headline-md text-primary dark:text-inverse-primary font-bold">Settings</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-variant dark:hover:bg-inverse-surface text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant dark:hover:bg-inverse-surface text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-8 max-w-5xl mx-auto w-full flex flex-col gap-8 pb-16">
+<!-- Profile & Preferences Card -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col gap-6">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Profile &amp; Preferences</h3>
+<p class="text-body-sm text-on-surface-variant">Update your personal information and daily productivity parameters.</p>
+</div>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg text-label-md font-label-md hover:opacity-90 transition-all active:scale-98">Save Changes</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-label-md text-on-surface font-medium">Full Name</label>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" type="text" value="Alex Morgan"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-md text-on-surface font-medium">Email Address</label>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" type="email" value="alex@dayflow.app"/>
+</div>
+</div>
+</section>
+<!-- Daily Water Goal Setting -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col gap-6">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Daily Water Goal</h3>
+<p class="text-body-sm text-on-surface-variant">Configure your target hydration intake for optimum daily wellness.</p>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-sm font-semibold">2,500 ml Goal</span>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<span class="text-body-md text-on-surface font-medium">Target Volume</span>
+<span class="text-headline-sm font-headline-sm text-primary">2,500 ml</span>
+</div>
+<input class="w-full accent-primary cursor-pointer" max="4000" min="1000" step="250" type="range" value="2500"/>
+<div class="flex justify-between text-label-sm text-on-surface-variant">
+<span>1,000 ml</span>
+<span>2,500 ml (Recommended)</span>
+<span>4,000 ml</span>
+</div>
+</div>
+</section>
+<!-- Reminder Intervals & Quiet Hours -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col gap-6">
+<div class="border-b border-outline-variant/20 pb-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Reminders &amp; Quiet Hours</h3>
+<p class="text-body-sm text-on-surface-variant">Manage how and when DayFlow nudges you throughout the day.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-label-md text-on-surface font-medium">Reminder Interval</label>
+<select class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+<option>Every 60 minutes</option>
+<option>Every 90 minutes</option>
+<option>Every 2 hours</option>
+<option>Custom schedule</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-label-md text-on-surface font-medium">Quiet Start</label>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" type="time" value="22:00"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-md text-on-surface font-medium">Quiet End</label>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" type="time" value="07:00"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Notification Permission Status & Theme Preference -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Notification Toggle -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col justify-between gap-6">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Notifications</h3>
+<p class="text-body-sm text-on-surface-variant">Grant permission to send desktop push alerts.</p>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<span class="text-body-md font-medium text-on-surface">System Push Status</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</section>
+<!-- Theme Preference -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col justify-between gap-6">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Appearance</h3>
+<p class="text-body-sm text-on-surface-variant">Select your preferred application color theme.</p>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-primary bg-surface text-primary font-medium text-body-md">
+<span class="material-symbols-outlined">light_mode</span>
+              Light
+            </button>
+<button class="flex items-center justify-center gap-2 p-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant font-medium text-body-md hover:border-primary transition-all">
+<span class="material-symbols-outlined">dark_mode</span>
+              Dark
+            </button>
+</div>
+</section>
+</div>
+<!-- Privacy & Account Controls -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0px_4px_20px_-2px_rgba(15,23,42,0.05)] flex flex-col gap-6">
+<div class="border-b border-outline-variant/20 pb-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Privacy &amp; Account Controls</h3>
+<p class="text-body-sm text-on-surface-variant">Manage your data export options and secure account deletion.</p>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">download</span>
+</div>
+<div>
+<p class="text-body-md font-medium text-on-surface">Export Data Archive</p>
+<p class="text-body-sm text-on-surface-variant">Download a complete CSV of your productivity history.</p>
+</div>
+</div>
+<button class="border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-label-md font-label-md hover:bg-surface-container transition-all">Export CSV</button>
+</div>
+<div class="border-t border-outline-variant/20 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<p class="text-body-md font-medium text-error">Delete Account</p>
+<p class="text-body-sm text-on-surface-variant">Permanently remove all your account history and personal data.</p>
+</div>
+</div>
+<button class="bg-error text-on-error px-4 py-2 rounded-lg text-label-md font-label-md hover:opacity-90 transition-all">Delete Account</button>
+</div>
+</section>
+</div>
+</main>
+</body></html>

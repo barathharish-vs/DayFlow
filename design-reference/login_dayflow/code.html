@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DayFlow - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-fixed": "#e0e3e5",
+            "on-secondary-container": "#00714d",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "background": "#faf8ff",
+            "primary": "#004ac6",
+            "surface": "#faf8ff",
+            "primary-fixed": "#dbe1ff",
+            "on-primary-fixed-variant": "#003ea8",
+            "error-container": "#ffdad6",
+            "secondary": "#006c49",
+            "surface-bright": "#faf8ff",
+            "tertiary": "#525657",
+            "error": "#ba1a1a",
+            "primary-fixed-dim": "#b4c5ff",
+            "on-surface-variant": "#434655",
+            "inverse-on-surface": "#eef0ff",
+            "surface-container-low": "#f2f3ff",
+            "outline-variant": "#c3c6d7",
+            "on-tertiary-fixed-variant": "#444749",
+            "on-secondary-fixed": "#002113",
+            "secondary-container": "#6cf8bb",
+            "inverse-primary": "#b4c5ff",
+            "surface-container-highest": "#dae2fd",
+            "inverse-surface": "#283044",
+            "on-background": "#131b2e",
+            "surface-variant": "#dae2fd",
+            "on-primary-fixed": "#00174b",
+            "on-secondary-fixed-variant": "#005236",
+            "surface-tint": "#0053db",
+            "on-primary-container": "#eeefff",
+            "secondary-fixed-dim": "#4edea3",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "surface-container": "#eaedff",
+            "on-tertiary-container": "#eff1f3",
+            "tertiary-container": "#6b6e70",
+            "outline": "#737686",
+            "on-error": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e2e7ff",
+            "tertiary-fixed-dim": "#c4c7c9",
+            "on-surface": "#131b2e",
+            "primary-container": "#2563eb",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#6ffbbe",
+            "on-tertiary-fixed": "#191c1e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1.25rem",
+            "space-xl": "3.5rem",
+            "space-xs": "0.375rem",
+            "gutter": "1.5rem",
+            "margin": "2rem",
+            "space-lg": "2rem",
+            "space-sm": "0.75rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f8f9fc] text-on-background font-body-md min-h-screen flex items-center justify-center p-gutter">
+<main class="w-full max-w-md">
+<!-- Login Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-lg border border-[#d0d7e7]">
+<!-- Brand Logo & Header -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-container text-on-primary mb-4 shadow-sm">
+<span class="material-symbols-outlined text-2xl">bolt</span>
+</div>
+<h1 class="font-headline-lg text-on-surface mb-2">DayFlow</h1>
+<p class="font-body-md text-on-surface-variant">Welcome back! Please enter your details.</p>
+</div>
+<!-- Form -->
+<form class="space-y-5" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5" for="email">Email address</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-xl">mail</span>
+</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-bright border border-[#d0d7e7] rounded-lg text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body-md transition-all" id="email" placeholder="name@example.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-on-surface mb-1.5" for="password">Password</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-xl">lock</span>
+</span>
+<input class="w-full pl-10 pr-10 py-2.5 bg-surface-bright border border-[#d0d7e7] rounded-lg text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body-md transition-all" id="password" placeholder="••••••••" required="" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-xl" id="pass-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me & Forgot Password -->
+<div class="flex items-center justify-between text-body-sm">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded border-[#d0d7e7] text-primary-container focus:ring-primary" type="checkbox"/>
+<span class="text-on-surface-variant">Remember me</span>
+</label>
+<a class="text-primary font-medium hover:underline" href="#">Forgot password?</a>
+</div>
+<!-- Sign In Button -->
+<button class="w-full py-3 px-4 bg-primary-container text-on-primary font-label-md rounded-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all shadow-sm" type="submit">
+          Sign In
+        </button>
+</form>
+<!-- Footer Link -->
+<div class="mt-8 text-center text-body-sm text-on-surface-variant">
+        Don't have an account? 
+        <a class="text-primary font-medium hover:underline ml-1" href="#">Create Account</a>
+</div>
+</div>
+</main>
+<script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const passIcon = document.getElementById('pass-icon');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passIcon.textContent = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        passIcon.textContent = 'visibility';
+      }
+    }
+  </script>
+</body></html>

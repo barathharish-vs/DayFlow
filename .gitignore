@@ -1,0 +1,23 @@
+node_modules/
+dist/
+build/
+target/
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local Maven repository
+.m2_repo/
+**/.m2_repo/
+
+# Local Maven repository
+.m2_repo/
+**/.m2_repo/
