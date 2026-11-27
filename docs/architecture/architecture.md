@@ -37,7 +37,7 @@ DayFlow is a high-performance productivity and wellness ecosystem designed to un
 - **State Management**: Centralized `AppContext` coordinating auth sessions, task mutations, hydration logging, and theme persistence.
 - **Offline Resilience**: Service worker caching and offline status detection.
 
-### 2. Application & API Layer (`backend/`)
+### 2. Application & API Layer (`02-backend/`)
 - **Technology**: Spring Boot 3, Spring Security 6, JJWT 0.12.
 - **REST Endpoints**:
   - `/api/auth`: Registration, authentication, password reset, profile management.

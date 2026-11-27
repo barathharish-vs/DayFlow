@@ -23,7 +23,7 @@ This guide details setting up the DayFlow environment for local development and 
 ## 2. Backend Setup
 1. Move to backend folder:
    ```bash
-   cd backend
+   cd 02-backend
    ```
 2. Configure credentials in `src/main/resources/application.properties` or environment variables:
    ```bash

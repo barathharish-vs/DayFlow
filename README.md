@@ -28,7 +28,7 @@
 - **Design & Icons**: Google Material Symbols, responsive CSS layout architecture (Desktop, Tablet, Mobile)
 - **State & Storage**: React Context (`AppContext`), JWT local token storage, PWA Service Worker
 
-### Backend Layer (`backend/`)
+### Backend Layer (`02-backend/`)
 - **Framework**: Spring Boot 3.4.4, Java 17
 - **Security**: Spring Security 6, JJWT (io.jsonwebtoken 0.12.6), BCrypt hashing
 - **Data Persistence**: Spring Data JPA, Hibernate, MySQL Connector/J
@@ -59,7 +59,7 @@ DayFlow/
 │   ├── vite.config.ts
 │   └── .env.example
 │
-├── backend/                      # Spring Boot 3 Java Backend
+├── 02-backend/                      # Spring Boot 3 Java Backend
 │   ├── src/main/java/com/dayflow/
 │   │   ├── controller/           # REST endpoints (Auth, Tasks, Water, Settings)
 │   │   ├── service/              # Business logic & weekly aggregations
@@ -110,9 +110,9 @@ DayFlow/
    *Note: Flyway will automatically apply migrations `V1` and `V2` when the backend boots.*
 
 ### Backend Setup
-1. Navigate to the `backend/` directory:
+1. Navigate to the `02-backend/` directory:
    ```bash
-   cd backend
+   cd 02-backend
    ```
 2. Configure credentials in `src/main/resources/application.properties` or via environment variables:
    ```bash
@@ -163,6 +163,6 @@ If using the development seed data:
   ```
 - **Backend Unit & Regression Testing**:
   ```bash
-  cd backend
+  cd 02-backend
   mvn test
   ```

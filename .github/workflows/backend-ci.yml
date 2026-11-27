@@ -4,11 +4,11 @@ on:
   push:
     branches: [ master, main ]
     paths:
-      - 'backend/**'
+      - '02-backend/**'
   pull_request:
     branches: [ master, main ]
     paths:
-      - 'backend/**'
+      - '02-backend/**'
 
 jobs:
   build-and-test:
@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend
+        working-directory: 02-backend
 
     steps:
       - name: Checkout repository
