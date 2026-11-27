@@ -48,12 +48,12 @@ DayFlow uses a normalized relational schema designed for MySQL 8+ and compatible
 ```
 
 ## Running Migrations
-Flyway migrations are automated in the backend service upon startup located in `src/main/resources/db/migration` and cataloged in `database/migrations/`:
+Flyway migrations are automated in the backend service upon startup located in `src/main/resources/db/migration` and cataloged in `03-database/migrations/`:
 - `V1__initial_schema.sql`: Establishes users, user_settings, tasks, and water_logs.
 - `V2__add_completed_at_and_password_resets.sql`: Adds task completion timestamps and tokenized password reset table.
 
 ## Seeding Sample Data
-Execute `database/seeds/seed.sql` in your MySQL database client or terminal:
+Execute `03-database/seeds/seed.sql` in your MySQL database client or terminal:
 ```bash
-mysql -u root -p dayflow_db < database/seeds/seed.sql
+mysql -u root -p dayflow_db < 03-database/seeds/seed.sql
 ```

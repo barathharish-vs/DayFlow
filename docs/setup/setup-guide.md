@@ -16,9 +16,9 @@ This guide details setting up the DayFlow environment for local development and 
    ```
 3. Load seed data (optional):
    ```bash
-   mysql -u root -p dayflow_db < database/seeds/seed.sql
+   mysql -u root -p dayflow_db < 03-database/seeds/seed.sql
    ```
-   *Note: Flyway automatically applies all versioned migrations (`database/migrations/`) on backend startup.*
+   *Note: Flyway automatically applies all versioned migrations (`03-database/migrations/`) on backend startup.*
 
 ## 2. Backend Setup
 1. Move to backend folder:

@@ -35,7 +35,7 @@
 - **Migrations**: Flyway version-controlled migrations
 - **Validation**: Jakarta Validation API (Bean Validation / Hibernate Validator)
 
-### Database Layer (`database/`)
+### Database Layer (`03-database/`)
 - **Engine**: MySQL 8.0+ / Relational Relational Database Schema
 - **Design**: Normalized tables with foreign key cascades, unique constraints, and composite indexes (`user_id`, `due_date`, `logged_at`).
 
@@ -73,7 +73,7 @@ DayFlow/
 │   ├── pom.xml
 │   └── .env.example
 │
-├── database/                     # Database Artifacts & Scripts
+├── 03-database/                     # Database Artifacts & Scripts
 │   ├── migrations/               # Baseline and incremental Flyway migration scripts
 │   ├── schema/                   # Consolidated DDL schema definition
 │   ├── seeds/                    # Development seed data for instant testing
@@ -105,7 +105,7 @@ DayFlow/
    ```
 2. (Optional) Run seed data:
    ```bash
-   mysql -u root -p dayflow_db < database/seeds/seed.sql
+   mysql -u root -p dayflow_db < 03-database/seeds/seed.sql
    ```
    *Note: Flyway will automatically apply migrations `V1` and `V2` when the backend boots.*
 

@@ -46,7 +46,7 @@ DayFlow is a high-performance productivity and wellness ecosystem designed to un
   - `/api/settings`: Hydration goals, reminder intervals, preferences.
   - `/api/health`: Health monitoring and uptime check.
 
-### 3. Persistence Layer (`database/`)
+### 3. Persistence Layer (`03-database/`)
 - **Technology**: MySQL 8.0+ / Spring Data JPA.
 - **Flyway Migrations**: Automated baseline and incremental schema versioning (`V1`, `V2`).
 - **Integrity**: Foreign keys with cascading deletions, unique constraints on emails and tokens, and composite indexes for user querying.
