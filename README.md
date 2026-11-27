@@ -22,7 +22,7 @@
 
 ## 2. Technology Stack
 
-### Frontend Layer (`frontend/`)
+### Frontend Layer (`01-frontend/`)
 - **Framework**: React 19 + TypeScript (strict mode)
 - **Tooling**: Vite 6, ESLint 9
 - **Design & Icons**: Google Material Symbols, responsive CSS layout architecture (Desktop, Tablet, Mobile)
@@ -46,7 +46,7 @@
 ```
 DayFlow/
 │
-├── frontend/                     # React 19 + TypeScript + Vite Client
+├── 01-frontend/                     # React 19 + TypeScript + Vite Client
 │   ├── public/                   # PWA Manifest, service worker, icons
 │   ├── src/
 │   │   ├── components/           # Dashboard, Tasks, WaterTracker, Reports, Auth
@@ -127,9 +127,9 @@ DayFlow/
    *The backend will boot on `http://localhost:8080`.*
 
 ### Frontend Setup
-1. Navigate to the `frontend/` directory:
+1. Navigate to the `01-frontend/` directory:
    ```bash
-   cd frontend
+   cd 01-frontend
    ```
 2. Install dependencies:
    ```bash
@@ -154,7 +154,7 @@ If using the development seed data:
 
 - **Frontend Typecheck & Production Build**:
   ```bash
-  cd frontend
+  cd 01-frontend
   npm run build
   ```
 - **Frontend Code Quality & Linting**:

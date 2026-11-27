@@ -32,7 +32,7 @@ DayFlow is a high-performance productivity and wellness ecosystem designed to un
 
 ## Layers & Components
 
-### 1. Presentation Layer (`frontend/`)
+### 1. Presentation Layer (`01-frontend/`)
 - **Technology**: React 19, TypeScript 5.8, Vite 6.
 - **State Management**: Centralized `AppContext` coordinating auth sessions, task mutations, hydration logging, and theme persistence.
 - **Offline Resilience**: Service worker caching and offline status detection.

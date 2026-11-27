@@ -38,7 +38,7 @@ This guide details setting up the DayFlow environment for local development and 
 ## 3. Frontend Setup
 1. Move to frontend folder:
    ```bash
-   cd frontend
+   cd 01-frontend
    ```
 2. Install dependencies and start Vite dev server:
    ```bash
