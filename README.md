@@ -79,7 +79,7 @@ DayFlow/
 │   ├── seeds/                    # Development seed data for instant testing
 │   └── README.md                 # Entity relationship diagram & DB guide
 │
-├── docs/                         # Technical Architecture & API Documentation
+├── 04-docs/                         # Technical Architecture & API Documentation
 │   ├── architecture.md           # End-to-end architecture & layers
 │   ├── api-documentation.md      # Complete REST API reference
 │   └── database-design.md        # Relational schema & performance indexes
